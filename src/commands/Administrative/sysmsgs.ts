@@ -1,23 +1,16 @@
-import axios from "axios";
-import { Message } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { ConfigService } from '../../utilities/ConfigService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	config.systemMessagesEnabled = !config.systemMessagesEnabled;
 
-	axios.patch(`${process.env.API_URL}/config/`, config)
-		.catch(() => {
-			return message.channel.send('Unable to toggle system messages due to server error.');
-		})
-		.then(() => {
-			if (config.systemMessagesEnabled) {
-				return message.channel.send('System Messages enabled for this server.');
-			} else {
-				return message.channel.send('System Messages disabled for this server.');
-			}
-		});
+	const updated: boolean = await ConfigService.updateConfig(config, message);
+
+	if (updated)
+		return message.channel.send({ content: `System messages ${config.systemMessagesEnabled ? 'Enabled' : 'Disabled'} for ${message.guild.name}.`});
 };
 
 const command: Command = {
@@ -29,7 +22,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

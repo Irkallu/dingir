@@ -1,18 +1,16 @@
-import { DateTime } from "luxon";
-import axios from "axios";
-import { Command } from "../../types/Command";
-import { BirthdayManager } from "../../utilities/BirthdayManager";
-import { NovaClient } from "../../client/NovaClient";
-import { Message } from "discord.js";
-import { ServerConfig } from "../../types/ServerConfig";
-import { UserProfile } from "../../types/UserProfile";
+import { DateTime } from 'luxon';
+import { Command } from '../../types/Command';
+import { BirthdayManager } from '../../utilities/BirthdayManager';
+import { NovaClient } from '../../client/NovaClient';
+import { Message } from 'discord.js';
+import { ServerConfig } from '../../types/ServerConfig';
+import { UserProfileService } from '../../utilities/UserProfileService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if(args.length < 1) {
 		return message.channel.send(`Please provide your birthday in the format DD/MM ie. \`${config.prefix}mybirthday 30/12\` for 30th December`);
 	}
 
-	const birthdayManager = new BirthdayManager();
 	const date = args[0].split('/');
 	const month = parseInt(date[1], 10);
 	let day = parseInt(date[0], 10);
@@ -39,20 +37,19 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		return message.channel.send('Looks like that date was invalid, make sure it is in the format of day/month');
 	}
 
-	const profileRes = await axios.get(`${process.env.API_URL}/users/profile/${message.guild.id}/${message.author.id}`);
+	const userProfile = await UserProfileService.getUserProfile(message.guild.id, message.author.id);
+	if (!userProfile)
+		return message.channel.send('There was a problem getting your user profile.');
 
-	const userProfile: UserProfile = profileRes.data;
 	userProfile.birthdayDay = day;
 	userProfile.birthdayMonth = month;
 
-	await axios.patch(`${process.env.API_URL}/users/profile/`, userProfile)
-		.catch(() => {
-			return message.channel.send('Unable to update profile due to server error.');
-		});
-
+	const updatedProfile = await UserProfileService.updateUserProfile(userProfile);
+	if (!updatedProfile)
+		return message.channel.send('There was a problem updating your user profile.');
 
 	message.channel.send(`I've set your next birthday to ${nextDate.toLocaleString(DateTime.DATE_FULL)}!`);
-	await birthdayManager.populateCalendars(client, message.guild.id);
+	BirthdayManager.populateCalendars(client, message.guild.id);
 };
 
 const command: Command = {
@@ -64,7 +61,7 @@ const command: Command = {
 	admin: false,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

@@ -1,10 +1,12 @@
 import axios from 'axios';
 import _ from 'underscore';
 import { NovaClient } from '../client/NovaClient';
+import { UserProfile } from '../types/UserProfile';
+import { Logger } from './Logger';
 
 export class DataCheck {
-	public async dataCleanup(client: NovaClient) {
-		client.logger.writeLog('Running data checkup job.');
+	public static async dataCleanup(client: NovaClient): Promise<void> {
+		Logger.writeLog('Running data checkup job.');
 
 		const servers = await axios.get(`${process.env.API_URL}/config/`);
 		const groupedSrvs = _.groupBy(servers.data, 'server_id');
@@ -13,12 +15,12 @@ export class DataCheck {
 			const guild = await client.guilds.fetch(srv)
 				.catch(err => {
 					if (err.code === 50001) {
-						client.logger.writeLog(`No longer have access to guild: ${srv}.`);
+						Logger.writeLog(`No longer have access to guild: ${srv}.`);
 						axios.delete(`${process.env.API_URL}/config/${srv}`).then(res => {
-							client.logger.writeLog(`Config deleted: ${res.status === 200}.`);
+							Logger.writeLog(`Config deleted: ${res.status === 200}.`);
 						});
 						axios.delete(`${process.env.API_URL}/users/profile/${srv}`).then(res => {
-							client.logger.writeLog(`User profiles deleted: ${res.status === 200}.`);
+							Logger.writeLog(`User profiles deleted: ${res.status === 200}.`);
 						});
 					}
 				});
@@ -27,16 +29,16 @@ export class DataCheck {
 				const usersRes = await axios.get(`${process.env.API_URL}/users/profile/${guild.id}`);
 				const users = usersRes.data;
 
-				users.forEach(u => {
-					if(!guild.member(u.user_id))
-						axios.delete(`${process.env.API_URL}/users/profile/${srv}/${u.user_id}`).then(res => {
-							client.logger.writeLog(`User ${u.user_id} no longer in server ${guild.id}.`);
-							client.logger.writeLog(`User profile deleted: ${res.status === 200}.`);
+				users.forEach((u: UserProfile) => {
+					if(!guild.members.cache.get(u.userId))
+						axios.delete(`${process.env.API_URL}/users/profile/${srv}/${u.userId}`).then(res => {
+							Logger.writeLog(`User ${u.userId} no longer in server ${guild.id}.`);
+							Logger.writeLog(`User profile deleted: ${res.status === 200}.`);
 						});
 				});
 			}
-		};
+		}
 
-		client.logger.writeLog('Data checkup job complete.');
+		Logger.writeLog('Data checkup job complete.');
 	}
-};
+}

@@ -1,27 +1,20 @@
-import axios from "axios";
-import { Message } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { ConfigService } from '../../utilities/ConfigService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	config.debug = !config.debug;
 
-	axios.patch(`${process.env.API_URL}/config/`, config)
-		.catch(() => {
-			return message.channel.send('Unable to update debug status due to server error.');
-		})
-		.then(() => {
-			if (config.debug) {
-				return message.channel.send('Debug mode enabled for errors on this server.');
-			} else {
-				return message.channel.send('Debug mode disabled for errors on this server.');
-			}
-		});
+	const updated: boolean = await ConfigService.updateConfig(config, message);
+
+	if (updated)
+		return message.channel.send({ content: `Debug mode ${config.debug ? 'enabled' : 'disabled'} for ${message.guild.name}.`});
 };
 
 const command: Command = {
-	name: "debug",
+	name: 'debug',
 	title: 'Toggle Debug',
 	description: 'Toggles showing debug messages in this server when errors occur.',
 	usage: 'debug',
@@ -29,7 +22,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

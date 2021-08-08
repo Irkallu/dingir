@@ -1,11 +1,11 @@
-import axios from "axios";
-import { Message, MessageEmbed, TextChannel } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { EmbedColours } from "../../resources/EmbedColours";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message, MessageEmbed, TextChannel } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { EmbedColours } from '../../resources/EmbedColours';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { ConfigService } from '../../utilities/ConfigService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	const newRules = message.content.slice(config.prefix.length + command.name.length).trim();
 
 	if (newRules.length === 0 && config.rulesMessage && config.rulesMessagePath) {
@@ -18,53 +18,35 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	if (config.rulesMessage && config.rulesMessagePath && newRules) {
 		const [chanId, msgId] = config.rulesMessagePath.split('/');
 		config.rulesMessage = newRules;
+		ConfigService.updateConfig(config, message);
+		
 
-		client.channels.fetch(chanId).then(rulesChan => {
-			(rulesChan as TextChannel).messages.fetch(msgId)
-				.then(msg => {
-					msg.edit(newRules);
-					if (config.announcementsChannelId) {
-						client.channels.fetch(config.announcementsChannelId).then(channel => {
-							const msg = new MessageEmbed()
-								.setColor(EmbedColours.info)
-								.setTitle('Rules have been updated')
-								.setDescription(`Rules have been updated in this server, please review them in <#${chanId}>`)
-								.setTimestamp();
-							(channel as TextChannel).send(msg)
-								.catch(err => {
-									message.channel.send('Error sending audit announcement.');
-									return client.logger.writeError(`Error sending audit announcement in guild ${message.guild}`, err);
-								});
-						});
-					}
-				})
-				.catch(err => {
-					message.channel.send('Error updating rules message.');
-					return client.logger.writeError(err);
-				});
-		});
+		const rulesChannel = await client.channels.fetch(chanId);
+		const rulesMessage = await (rulesChannel as TextChannel).messages.fetch(msgId);
+
+		rulesMessage.edit({ content: newRules });
+		if (!config.announcementsChannelId)
+			return;
+
+		const announcementsChannel = await client.channels.fetch(config.announcementsChannelId);
+
+		const announcement = new MessageEmbed()
+			.setColor(EmbedColours.info)
+			.setTitle('Rules have been updated')
+			.setDescription(`Rules have been updated in this server, please review them in <#${chanId}>`)
+			.setTimestamp();
+
+		(announcementsChannel as TextChannel).send({ embeds: [announcement]  });
 	} else if (!config.rulesMessage && newRules) {
-		message.channel.send(newRules)
-			.then(message => {
-				config.rulesMessagePath = `${message.channel.id}/${message.id}`;
-				config.rulesMessage = newRules;
-				axios.patch(`${process.env.API_URL}/config/`, config)
-					.catch(() => {
-						return message.channel.send('Unable to update rules due to server error.');
-					});
-				return message.react('✅')
-					.catch((err) => {
-						client.logger.writeError(err);
-					});
-			})
-			.catch((err) => {
-				client.logger.writeError(err);
-			});
+		const rulesMessage = await message.channel.send(newRules);
+
+		config.rulesMessagePath = `${rulesMessage.channel.id}/${rulesMessage.id}`;
+		config.rulesMessage = newRules;
+
+		ConfigService.updateConfig(config, message);
+		return message.react('✅');
 	} else {
-		axios.patch(`${process.env.API_URL}/config/`, config)
-			.catch(() => {
-				return message.channel.send('Unable to remove rules due to server error.');
-			});
+		ConfigService.updateConfig(config, message);
 		return message.channel.send('Rules removed.');
 	}
 
@@ -79,7 +61,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: true,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

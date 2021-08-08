@@ -1,11 +1,11 @@
-import { Message, MessageEmbed } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { EmbedColours } from "../../resources/EmbedColours";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
-import { CommandAccess } from "../../utilities/CommandAccess";
+import { Message, MessageEmbed } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { EmbedColours } from '../../resources/EmbedColours';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { CommandAccess } from '../../utilities/CommandAccess';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	const embed = new MessageEmbed()
 		.setThumbnail((client.user.displayAvatarURL()))
 		.setTitle('Command Information')
@@ -38,7 +38,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	embed.addField('Usage', config ? config.prefix + cmd.usage : cmd.usage);
 	embed.addField('Example', config ? config.prefix + cmd.example : cmd.example);
 
-	return message.channel.send(embed);
+	return message.channel.send({ embeds: [embed] });
 };
 
 const command: Command = {
@@ -50,7 +50,7 @@ const command: Command = {
 	admin: false,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text', 'dm'],
+	channels: ['GUILD_TEXT', 'DM'],
 	run: run
 };
 

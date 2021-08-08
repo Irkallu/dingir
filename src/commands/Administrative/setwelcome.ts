@@ -1,11 +1,12 @@
-import axios from "axios";
-import { Message, MessageEmbed, TextChannel } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { EmbedColours } from "../../resources/EmbedColours";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message, MessageEmbed } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { EmbedColours } from '../../resources/EmbedColours';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { ChannelService } from '../../utilities/ChannelService';
+import { ConfigService } from '../../utilities/ConfigService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	const newWelcome = message.content.slice(config.prefix.length + command.name.length).trim();
 
 	if (newWelcome.length < 1) {
@@ -23,33 +24,17 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		config.welcomeMessage = newWelcome;
 	}
 
-	axios.patch(`${process.env.API_URL}/config/`, config)
-		.catch(() => {
-			return message.channel.send('Unable to update welcome message due to server error.');
-		});
+	await ConfigService.updateConfig(config, message);
 
-	if (config.auditChannelId) {
-		client.channels.fetch(config.auditChannelId)
-			.then(channel => {
-				const audit = new MessageEmbed()
-					.setColor(EmbedColours.neutral)
-					.setAuthor(message.author.tag, message.author.displayAvatarURL())
-					.setDescription(`Welcome Message ${!config.welcomeMessage ? 'Removed' : 'Updated'}`)
-					.addField('New Welcome Message', !config.welcomeMessage ? 'Not set' : config.welcomeMessage)
-					.addField('Old Welcome Message', !oldWelcome ? 'Not set' : oldWelcome)
-					.setTimestamp();
-				(channel as TextChannel).send(audit);
-			}).catch((err) => {
-				client.logger.writeError(err);
-			});
-	}
+	const audit = new MessageEmbed()
+		.setColor(EmbedColours.neutral)
+		.setAuthor(message.author.tag, message.author.displayAvatarURL())
+		.setDescription(`Welcome Message ${!config.welcomeMessage ? 'Removed' : 'Updated'}`)
+		.addField('New Welcome Message', !config.welcomeMessage ? 'Not set' : config.welcomeMessage)
+		.addField('Old Welcome Message', !oldWelcome ? 'Not set' : oldWelcome)
+		.setTimestamp();
 
-	if (!config.welcomeMessage) {
-		return message.channel.send('Welcome message removed.');
-	} else {
-		return message.channel.send('Welcome message updated.');
-	}
-
+	ChannelService.sendAuditMessage(client, config, audit);
 };
 
 const command: Command = {
@@ -61,7 +46,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

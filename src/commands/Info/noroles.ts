@@ -1,12 +1,11 @@
-import { Message, MessageEmbed } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
-	const members = message.guild.members.cache.filter(member => {
-		return member.roles.cache.array().length === 1;
-	});
+const run = async (client: NovaClient, message: Message): Promise<any> => {
+	const members = message.guild.members.cache.filter(member => 
+		member.roles.cache.size === 1
+	);
 
 	let response: string;
 
@@ -21,7 +20,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		});
 	}
 
-	return message.channel.send(response, {'allowedMentions': { 'parse': []}});
+	return message.channel.send({ content: response, allowedMentions: { 'parse': []} });
 };
 
 const command: Command = {
@@ -33,7 +32,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

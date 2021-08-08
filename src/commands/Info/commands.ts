@@ -1,11 +1,11 @@
-import { Command } from '../../types/Command'
+import { Command } from '../../types/Command';
 import { Message, MessageEmbed } from 'discord.js';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { CommandAccess } from '../../utilities/CommandAccess';
 import { NovaClient } from '../../client/NovaClient';
 import { ServerConfig } from '../../types/ServerConfig';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	const embed = new MessageEmbed()
 		.setThumbnail((client.user.displayAvatarURL()))
 		.setTitle('Commands List')
@@ -19,7 +19,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 			embed.addField(config ? config.prefix + cmd.usage : cmd.usage, cmd.description);
 	});
 
-	return message.channel.send(embed);
+	return message.channel.send({ embeds: [embed] });
 };
 
 const command: Command = {
@@ -31,7 +31,7 @@ const command: Command = {
 	admin: false,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text', 'dm'],
+	channels: ['GUILD_TEXT', 'DM'],
 	run: run
 };
 
