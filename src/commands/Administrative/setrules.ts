@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, TextChannel } from 'discord.js';
+import { Message, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
@@ -6,8 +6,16 @@ import { ServerConfig } from '../../types/ServerConfig';
 import { ConfigService } from '../../utilities/ConfigService';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
+	const currentRules = config.rulesMessage;
 	const newRules = message.content.slice(config.prefix.length + command.name.length).trim();
-
+	const buttonRow = new MessageActionRow()
+		.addComponents(
+			new MessageButton()
+				.setCustomId('rules-accept')
+				.setLabel('Accept Rules')
+				.setStyle('PRIMARY'),
+		);
+	
 	if (newRules.length === 0 && config.rulesMessage && config.rulesMessagePath) {
 		config.rulesMessage = null;
 		config.rulesMessagePath = null;
@@ -24,8 +32,8 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 		const rulesChannel = await client.channels.fetch(chanId);
 		const rulesMessage = await (rulesChannel as TextChannel).messages.fetch(msgId);
 
-		rulesMessage.edit({ content: newRules });
-		if (!config.announcementsChannelId)
+		rulesMessage.edit({ content: newRules, components: [buttonRow] });
+		if (!config.announcementsChannelId || currentRules === newRules)
 			return;
 
 		const announcementsChannel = await client.channels.fetch(config.announcementsChannelId);
@@ -38,13 +46,12 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 
 		(announcementsChannel as TextChannel).send({ embeds: [announcement]  });
 	} else if (!config.rulesMessage && newRules) {
-		const rulesMessage = await message.channel.send(newRules);
+		const rulesMessage = await message.channel.send({ content: newRules, components: [buttonRow] });
 
 		config.rulesMessagePath = `${rulesMessage.channel.id}/${rulesMessage.id}`;
 		config.rulesMessage = newRules;
 
 		ConfigService.updateConfig(config, message);
-		return message.react('✅');
 	} else {
 		ConfigService.updateConfig(config, message);
 		return message.channel.send('Rules removed.');
