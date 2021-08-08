@@ -1,12 +1,12 @@
-import { Message, MessageEmbed } from "discord.js";
-import { DateTime } from "luxon";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message } from 'discord.js';
+import { DateTime } from 'luxon';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (args.length < 2) 
-		return message.channel.send(`Please provide the required arguments: \`${config.prefix}${command.usage}\``)
+		return message.channel.send(`Please provide the required arguments: \`${config.prefix}${command.usage}\``);
 
 	const days = args[0];
 	const role = message.mentions.roles.first();
@@ -35,7 +35,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		});
 	}
 
-	return message.channel.send(response, {'allowedMentions': { 'parse': []}});
+	return message.channel.send({ content: response, allowedMentions: { 'parse': []} });
 };
 
 const command: Command = {
@@ -47,7 +47,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

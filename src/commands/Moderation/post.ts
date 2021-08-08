@@ -1,31 +1,33 @@
-import { Message } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message, TextChannel } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
-	const chan = message.mentions.channels.first();
+const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
+	const channel = message.mentions.channels.first();
 
-	if (!chan) {
+	if (!channel) {
 		return message.channel.send('Channel not found, or I do not have permission to access it.');
 	}
 
-	let msg = message.content.slice(config.prefix.length + command.name.length).trim();
-	msg = msg.slice(args[0].length).trim();
+	if (!channel.isText) {
+		return message.channel.send('Channel must be a text channel.');
+	}
 
-	let attachments = message.attachments;
-	let files = [];
+	let messageContent = message.content.slice(config.prefix.length + command.name.length).trim();
+	messageContent = messageContent.slice(args[0].length).trim();
+
+	const attachments = message.attachments;
+	const files = [];
 
 	attachments.forEach(a => {
 		files.push(a.url);
 	});
 
-	chan.send(msg, {files: files})
+	(channel as TextChannel).send({ content: messageContent, files: files })
 		.catch((error) => {
 			if (error.message === 'Missing Access') {
 				return message.channel.send('I do not have permission to access this channel.');
-			} else {
-				throw(error);
 			}
 		});
 };
@@ -39,7 +41,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

@@ -1,25 +1,16 @@
-import axios from "axios";
-import { Message } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
-import { BirthdayManager } from "../../utilities/BirthdayManager";
+import { Message } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { BirthdayManager } from '../../utilities/BirthdayManager';
+import { ConfigService } from '../../utilities/ConfigService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
-	const birthdayManager = new BirthdayManager();
-
-	message.channel.send('populating...')
-		.then(message => {
-			config.birthdayCalendarMessagePath = `${message.channel.id}/${message.id}`;
-			axios.patch(`${process.env.API_URL}/config/`, config)
-				.catch(() => {
-					return message.channel.send('Unable to update rules due to server error.');
-				});
-				birthdayManager.populateCalendars(client, message.guild.id)
-		})
-		.catch((err) => {
-			client.logger.writeError(err);
-		});
+const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
+	const birthdaysCalendar = await message.channel.send('populating...');
+	config.birthdayCalendarMessagePath = `${birthdaysCalendar.channel.id}/${birthdaysCalendar.id}`;
+	const updated = await ConfigService.updateConfig(config, message);
+	if (updated)
+		BirthdayManager.populateCalendars(client, message.guild.id);
 };
 
 const command: Command = {
@@ -31,7 +22,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: true,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

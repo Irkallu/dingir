@@ -1,93 +1,108 @@
-import { NovaClient } from "../client/NovaClient";
+import { NovaClient } from '../client/NovaClient';
 import axios from 'axios';
-import { TextChannel } from "discord.js";
-import { DateTime } from "luxon";
+import { TextChannel } from 'discord.js';
+import { DateTime } from 'luxon';
 import _ from 'underscore';
-import { ServerConfig } from "../types/ServerConfig";
-import { UserProfile } from "../types/UserProfile";
+import { ServerConfig } from '../types/ServerConfig';
+import { UserProfile } from '../types/UserProfile';
+import { ConfigService } from './ConfigService';
+import { UserProfileService } from './UserProfileService';
+import { Logger } from './Logger';
 
 export class BirthdayManager {
-	public async populateCalendars (client: NovaClient, serverId?: string) {
-		client.logger.writeLog('Running birthday calendar update job.');
+	public static async populateCalendars (client: NovaClient, serverId?: string): Promise<void> {
+		Logger.writeLog('Running birthday calendar update job.');
 
-		serverId = serverId ?? '';
-	
-		const profileRes = await axios.get(`${process.env.API_URL}/users/birthdays/all/${serverId}`);
-		const profiles = profileRes.data as UserProfile[];
-		const usersWithBirthdaysByServer = _.groupBy(profiles, 'serverId');
+		let parsedConfigs: ServerConfig[];
 		
-		for (const server in usersWithBirthdaysByServer) {
-			const res = await axios.get(`${process.env.API_URL}/config/${server}`)
-				.catch(err => {
-					return client.logger.writeError('Error getting birthdays.', err);
+		if (serverId) {
+			const serverConfig = await ConfigService.getConfig(serverId)
+				.catch((err) => {
+					return Logger.writeError('Error fetching server config for single run.', err);
 				});
-	
-			if (!res)
-				return;
-				
-			const config: ServerConfig = res.data;
-			if (config && config.birthdayCalendarMessagePath) {
-				const [chan, msg] = config.birthdayCalendarMessagePath.split('/');
-				
-				const chanToEdit = await client.channels.fetch(chan);
-				if (!chanToEdit)
-					return client.logger.writeError(`Could not find birthday channel for server ${config.serverId}`);
-				const msgToEdit = await (chanToEdit as TextChannel).messages.fetch(msg);
-				
-				if (msgToEdit) {
-					const users = usersWithBirthdaysByServer[server];
-					const mapped = users.map(u => {
-						let alteredForLeap = false;
-	
-						const now = DateTime.local();
-	
-						if (!now.isInLeapYear && u.birthdayDay === 29 && u.birthdayMonth === 2) {
-							u.birthdayDay--;
-							alteredForLeap = true;
-						}
-	
-						let nextDate = DateTime.local(now.year, u.birthdayMonth, u.birthdayDay);
-	
-						if (nextDate <= now) {
-							nextDate = nextDate.plus({year: 1});
-							if (nextDate.isInLeapYear && alteredForLeap) {
-								nextDate = nextDate.plus({day: 1});
-							}
-						}
-	
-						return {userId: u.userId, birthday: nextDate};
-					});
-	
-					const sorted = _.sortBy(mapped, (o) => o.birthday).slice(0, 10);
-					const groupedSort = _.groupBy(sorted, 'birthday');
-	
-					let calMsg = (':tada: ~ Upcoming Birthdays ~ :tada:\n');
-					calMsg += ('Here\'s the next 10 birthdays in this guild!\n');
-					calMsg += (`Add your birthday using \`${config.prefix}mybirthday\`\n`);
-					calMsg += ('-------------');
-	
-					for (const group in groupedSort) {
-						const date = groupedSort[group][0].birthday.toLocaleString(DateTime.DATE_FULL);
-						let members = '';
-	
-						groupedSort[group].forEach(m => {
-							members += `<@${m.userId}>\n`;
-						});
-						calMsg += (`\n**${date}**\n${members}`);
-						calMsg += ('-------------');
-					}
-	
-					msgToEdit.edit(calMsg, {'allowedMentions': { 'users' : []}});
-				}
-	
-			}
+			if (serverConfig)
+				parsedConfigs = [serverConfig];
+		} else {
+			const serverConfigs = await ConfigService.getConfigs()
+				.catch((err) => {
+					return Logger.writeError('Error fetching server configs for bulk run.', err);
+				});
+			if (serverConfigs)
+				parsedConfigs = serverConfigs;
 		}
 
-		client.logger.writeLog('Finished birthday calendar update job.');
+		if (parsedConfigs.length < 1)
+			return Logger.writeLog('No server configs to run birthday calendar population for.');
+
+		parsedConfigs = parsedConfigs.filter(config => config.birthdayCalendarMessagePath);
+
+		parsedConfigs.forEach(async (config) => {
+			const profiles = await UserProfileService.getServerBirthdays(config.serverId);
+			const [channelId, messageId] = config.birthdayCalendarMessagePath.split('/');
+			let messageContent = (':tada: ~ Upcoming Birthdays ~ :tada:\n');
+
+			const chanToEdit = await client.channels.fetch(channelId);
+			if (!chanToEdit)
+				return Logger.writeError(`Could not find birthday channel for server ${config.serverId}`);
+
+			const birthdayMessage = await (chanToEdit as TextChannel).messages.fetch(messageId);
+			if (!birthdayMessage)
+				return Logger.writeError(`Could not find birthday message for server ${config.serverId}`);
+				
+			if (profiles.length < 1) {
+				messageContent += ('-------------');
+				messageContent += (`There are no birthdays in this server, set yours with \`${config.prefix}mybirthday\``);
+			}
+			else {
+				const mapped = profiles.map(u => {
+					let alteredForLeap = false;
+
+					const now = DateTime.local();
+
+					if (!now.isInLeapYear && u.birthdayDay === 29 && u.birthdayMonth === 2) {
+						u.birthdayDay--;
+						alteredForLeap = true;
+					}
+
+					let nextDate = DateTime.local(now.year, u.birthdayMonth, u.birthdayDay);
+
+					if (nextDate <= now) {
+						nextDate = nextDate.plus({year: 1});
+						if (nextDate.isInLeapYear && alteredForLeap) {
+							nextDate = nextDate.plus({day: 1});
+						}
+					}
+
+					return {userId: u.userId, birthday: nextDate};
+				});
+
+				const sorted = _.sortBy(mapped, (o) => o.birthday).slice(0, 10);
+				const groupedSort = _.groupBy(sorted, 'birthday');
+
+				messageContent += ('Here\'s the next 10 birthdays in this guild!\n');
+				messageContent += (`Add your birthday using \`${config.prefix}mybirthday\`\n`);
+				messageContent += ('-------------');
+
+				for (const group in groupedSort) {
+					const date = groupedSort[group][0].birthday.toLocaleString(DateTime.DATE_FULL);
+					let members = '';
+
+					groupedSort[group].forEach(m => {
+						members += `<@${m.userId}>\n`;
+					});
+					messageContent += (`\n**${date}**\n${members}`);
+					messageContent += ('-------------');
+				}
+			}
+
+			birthdayMessage.edit({content: messageContent, allowedMentions: { 'users' : []}});
+		});
+
+		Logger.writeLog('Finished birthday calendar update job.');
 	}
 
-	public async notifyBirthdays(client: NovaClient) {
-		client.logger.writeLog('Running birthday notifications job.');
+	public static async notifyBirthdays(client: NovaClient): Promise<void> {
+		Logger.writeLog('Running birthday notifications job.');
 
 		const profileRes = await axios.get(`${process.env.API_URL}/users/birthdays`);
 		const profiles = profileRes.data as UserProfile[];
@@ -96,7 +111,7 @@ export class BirthdayManager {
 		for (const server in usersWithBirthdaysByServer) {
 			const res = await axios.get(`${process.env.API_URL}/config/${server}`)
 				.catch(err => {
-					return client.logger.writeError('Error getting birthdays.', err);
+					return Logger.writeError('Error getting birthdays.', err);
 				});
 
 			if (!res)
@@ -106,30 +121,30 @@ export class BirthdayManager {
 			if (config && config.announcementsChannelId) {
 				const srv = await client.guilds.fetch(server)
 					.catch(err => {
-						return client.logger.writeError('Error getting server.', err);
+						return Logger.writeError('Error getting server.', err);
 					});
 				const chan = await client.channels.fetch(config.announcementsChannelId)
 					.catch(err => {
-						return client.logger.writeError('Error getting channel.', err);
+						return Logger.writeError('Error getting channel.', err);
 					});
 				if (!srv || !chan) {
-					return client.logger.writeError('Channel or Server object empty');
+					return Logger.writeError('Channel or Server object empty');
 				}
 				let tags = '';
 				usersWithBirthdaysByServer[server].forEach(u => {
-					if (srv.member(u.userId))
+					if (srv.members.resolve(u.userId))
 						tags += `<@${u.userId}>, `;
 				});
 				if (tags) {
 					tags = tags.replace(/,\s*$/, '');
-					let msg = `Happy Birthday to ${tags}!`;
-					return (chan as TextChannel).send(msg)
+					const msg = `Happy Birthday to ${tags}!`;
+					(chan as TextChannel).send(msg)
 						.catch(err => {
-							return client.logger.writeError('Error sending Birthday message', err);
+							return Logger.writeError('Error sending Birthday message', err);
 						});
 				}
 			}
 		}
-		client.logger.writeLog('Finished birthday notifications job.');
+		Logger.writeLog('Finished birthday notifications job.');
 	}
 }

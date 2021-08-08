@@ -1,12 +1,9 @@
-import { Message } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
-	let mem = message.mentions.members.first() ?? message.member;
-
-	client.emit('guildMemberAdd', mem);
+const run = async (client: NovaClient, message: Message): Promise<any> => {
+	client.emit('guildMemberAdd', message.mentions.members.first() ?? message.member);
 };
 
 const command: Command = {
@@ -18,7 +15,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

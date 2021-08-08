@@ -1,63 +1,52 @@
-import axios from 'axios';
-import { MessageEmbed, MessageReaction, TextChannel, User } from 'discord.js';
+import { MessageEmbed, MessageReaction, User } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { EmbedColours } from '../resources/EmbedColours';
 import { RunFunction } from '../types/Event';
-import { ServerConfig } from '../types/ServerConfig';
+import { ChannelService } from '../utilities/ChannelService';
+import { ConfigService } from '../utilities/ConfigService';
 
-export const name: string = 'messageReactionAdd';
+export const name = 'messageReactionAdd';
 export const run: RunFunction = async (client: NovaClient, messageReaction: MessageReaction, user: User) => {
-	// Get Rules Message
-	axios.get(`${process.env.API_URL}/config/${messageReaction.message.guild.id}`).then(async res => {
-		const config: ServerConfig = res.data;
-		if (config.rulesMessagePath) {
-			const str = config.rulesMessagePath.split('/');
-			if (messageReaction.partial) {
-				await messageReaction.fetch();
-			}
-			if (messageReaction.message.id === str[1] && messageReaction.emoji.name === '✅') {
-				let guestRoles = config.guestRoleIds.split(',');
-				messageReaction.message.guild.roles.fetch()
-					.then(roles => {
-						messageReaction.message.guild.members.fetch(user.id)
-							.then(member => {
-								if (member.roles.cache.filter(role => role.name !== '@everyone').size === 0)
-									member.roles.add(roles.cache.filter(role => guestRoles.includes(role.id)))
-										.then(() => {
-											if (config.auditChannelId) {
-												client.channels.fetch(config.auditChannelId)
-													.then(channel => {
-														const audit = new MessageEmbed()
-															.setColor(EmbedColours.neutral)
-															.setAuthor(member.user.tag, member.user.displayAvatarURL())
-															.setDescription('Rules accepted by member.')
-															.addField('ID', member.user.id)
-															.setTimestamp();
-														(channel as TextChannel).send(audit);
-													}).catch((err) => {
-														client.logger.writeError(err);
-													});
-											}
-										})
-										.catch(() => {
-											if (config.auditChannelId) {
-												client.channels.fetch(config.auditChannelId)
-													.then(channel => {
-														const audit = new MessageEmbed()
-															.setColor(EmbedColours.negative)
-															.setAuthor(member.user.tag, member.user.displayAvatarURL())
-															.setDescription('Unable to provide guest role to user.')
-															.addField('ID', member.user.id)
-															.setTimestamp();
-														(channel as TextChannel).send(audit);
-													}).catch((err) => {
-														client.logger.writeError(err);
-													});
-											}
-										});
-							});
-					});
-			}
-		}
-	})
+	if (!messageReaction.message.guild)
+		return;
+
+	const serverConfig = await ConfigService.getConfig(messageReaction.message.guild.id);
+	if (!serverConfig || !serverConfig.rulesMessagePath || !serverConfig.guestRoleIds)
+		return;
+	
+	if (messageReaction.partial)
+		await messageReaction.fetch();
+
+	const rulesMessage = serverConfig.rulesMessagePath.split('/')[1];
+
+	if (messageReaction.message.id !== rulesMessage || messageReaction.emoji.name !== '✅')
+		return;
+
+
+	const guestRoleIds = serverConfig.guestRoleIds.split(',');
+	const guildRoles = await messageReaction.message.guild.roles.fetch();
+	const guildMember = await messageReaction.message.guild.members.fetch(user.id);
+
+	if (guildMember.roles.cache.filter(role => role.name !== '@everyone').size > 0)
+		return;
+
+	guildMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)))
+		.then(() => {
+			const audit = new MessageEmbed()
+				.setColor(EmbedColours.neutral)
+				.setAuthor(user.tag, user.displayAvatarURL())
+				.setDescription('Rules accepted by member.')
+				.addField('ID', user.id)
+				.setTimestamp();
+			return ChannelService.sendAuditMessage(client, serverConfig, audit);
+		})
+		.catch(() => {
+			const audit = new MessageEmbed()
+				.setColor(EmbedColours.negative)
+				.setAuthor(user.tag, user.displayAvatarURL())
+				.setDescription('Unable to provide guest role to user.')
+				.addField('ID', user.id)
+				.setTimestamp();
+			return ChannelService.sendAuditMessage(client, serverConfig, audit);
+		});
 };

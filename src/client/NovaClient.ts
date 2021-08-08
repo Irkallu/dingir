@@ -1,5 +1,5 @@
 import { glob } from "glob";
-import { Client, Collection } from "discord.js";
+import { Client, Collection, Intents } from "discord.js";
 import { Command } from "../types/Command";
 import { promisify } from "util";
 import { Event } from "../types/Event";
@@ -10,11 +10,16 @@ const globPromise = promisify(glob);
 class NovaClient extends Client {
 	public commands: Collection<string, Command> = new Collection();
 	public events: Collection<string, Event> = new Collection();
-	public logger: Logger;
 
 	public constructor() {
-		super ({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
-		this.logger = new Logger();
+		super ({ 
+			partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+			intents: [	Intents.FLAGS.GUILDS,
+						Intents.FLAGS.GUILD_MEMBERS,
+						Intents.FLAGS.GUILD_MESSAGES,
+						Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+						Intents.FLAGS.DIRECT_MESSAGES ] 
+			});
 	}
 
 	public async start(): Promise<void> {
@@ -40,13 +45,13 @@ class NovaClient extends Client {
 		});
 
 		process.on('SIGTERM', () => {
-			this.logger.writeLog('SIGTERM Received, destroying client & shutting down.');
+			Logger.writeLog('SIGTERM Received, destroying client & shutting down.');
 			this.destroy();
 			process.exit();
 		});
 
 		await this.login(process.env.TOKEN);
-		this.logger.writeLog('Logged in');
+		Logger.writeLog('Logged in');
 	}
 }
 

@@ -3,19 +3,17 @@ import { NovaClient } from '../client/NovaClient';
 import { RunFunction } from '../types/Event';
 import { BirthdayManager } from '../utilities/BirthdayManager';
 import { DataCheck } from '../utilities/DataCheck';
+import { Logger } from '../utilities/Logger';
 
-export const name: string = 'ready';
+export const name = 'ready';
 export const run: RunFunction = async (client: NovaClient) => {
-	await client.user.setPresence({status: 'online'});
+	client.user.setPresence({ status: 'online' });
 
-	const birthdayManager = new BirthdayManager();
-	const dataCheck = new DataCheck();
-
-	client.logger.writeLog('Online');
+	Logger.writeLog('Online');
 	const birthdaySchedule = schedule.scheduleJob(process.env.JOB_SCHEDULE, () => {
-		dataCheck.dataCleanup(client);
-		birthdayManager.notifyBirthdays(client);
-		birthdayManager.populateCalendars(client);
+		DataCheck.dataCleanup(client);
+		BirthdayManager.notifyBirthdays(client);
+		BirthdayManager.populateCalendars(client);
 	});
-	client.logger.writeLog(`Primary schedule set, next run at ${birthdaySchedule.nextInvocation()}`);
+	Logger.writeLog(`Primary schedule set, next run at ${birthdaySchedule.nextInvocation()}`);
 };

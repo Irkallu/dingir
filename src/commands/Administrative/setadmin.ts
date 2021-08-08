@@ -1,34 +1,32 @@
-import axios from "axios";
-import { Message } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { ConfigService } from '../../utilities/ConfigService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (config.adminRoleId) {
 		if (!message.member.roles.cache.has(config.adminRoleId)) {
-			return message.channel.send('You do not have the required permissions for this command.');
+			return message.channel.send({ content: 'You do not have the required permissions for this command.' });
 		}
 	}
-	const newRole = message.mentions.roles.first();
 
-	if(args.length === 0 && config.adminRoleId) {
+	const newRole = message.mentions.roles.first();
+	if (args.length === 0 && config.adminRoleId) {
 		config.adminRoleId = null;
+	} else if (args.length === 0 && !config.adminRoleId) {
+		return message.channel.send({ content: 'Please tag a role to set as admin.' });
 	} else if (!newRole) {
-		return message.channel.send('Role not found, make sure you tagged it correctly.');
+		return message.channel.send({ content: 'Role not found, make sure you tagged it correctly.' });
 	} else {
 		config.adminRoleId = newRole.id;
 	}
 
-	axios.patch(`${process.env.API_URL}/config/`, config)
-		.catch(() => {
-			return message.channel.send('Unable to update admin role due to server error.');
-		});
-
-	if(config.adminRoleId) {
-		return message.channel.send(`Admin role updated to ${newRole.name}.`);
-	} else {
-		return message.channel.send('Admin role removed.');
+	const updated: boolean = await ConfigService.updateConfig(config, message);
+	if (updated && config.adminRoleId) {
+		return message.channel.send({ content: `Admin role updated to ${newRole.name} for ${message.guild.name}.` });
+	} else if (updated) {
+		return message.channel.send({ content: `Admin role removed for ${message.guild.name}.` });
 	}
 };
 
@@ -42,7 +40,7 @@ const command: Command = {
 	deleteCmd: false,
 	limited: true,
 	limitation: 'Can be used by anyone when there is no admin role set for setup purposes.',
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

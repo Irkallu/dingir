@@ -1,77 +1,67 @@
-import axios from "axios";
-import { Message, MessageEmbed, TextChannel } from "discord.js";
-import { NovaClient } from "../../client/NovaClient";
-import { EmbedColours } from "../../resources/EmbedColours";
-import { Command } from "../../types/Command";
-import { ServerConfig } from "../../types/ServerConfig";
+import { Message, MessageEmbed } from 'discord.js';
+import { NovaClient } from '../../client/NovaClient';
+import { EmbedColours } from '../../resources/EmbedColours';
+import { Command } from '../../types/Command';
+import { ServerConfig } from '../../types/ServerConfig';
+import { ChannelService } from '../../utilities/ChannelService';
+import { ConfigService } from '../../utilities/ConfigService';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]) => {
+const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (args.length === 0) {
 		if (!config.guestRoleIds) {
 			return message.channel.send('No guest roles set');
 		}
 
-		let currentGuestRoles = [];
-		return message.guild.roles.fetch()
-			.then(roles => {
-				let guestRoleIds = config.guestRoleIds.split(',');
-				guestRoleIds.forEach(role => {
-					const guestRole = roles.resolve(role);
-					currentGuestRoles.push(guestRole ? `@${guestRole.name}` : 'Unknown role');
-				});
+		const currentGuestRoles = [];
+		const guildRoles = await message.guild.roles.fetch();
+		const guestRoleIds = config.guestRoleIds.split(',');
+		
+		guestRoleIds.forEach(roleId => {
+			const guestRole = guildRoles.get(roleId);
+			currentGuestRoles.push(guestRole ? guestRole.toString() : 'Unknown');
+		});
 
-				const embed = new MessageEmbed()
-					.setColor(EmbedColours.info)
-					.setTitle('Current Guest Roles')
-					.setDescription(currentGuestRoles.join('\n'))
-					.setTimestamp();
+		const embed = new MessageEmbed()
+			.setColor(EmbedColours.info)
+			.setTitle('Current Guest Roles')
+			.setDescription(currentGuestRoles.join('\n'))
+			.setTimestamp();
 
-				return message.channel.send(embed);
-			});
-
-
+		return message.channel.send({ embeds: [embed] });
 	}
 
-	const newRoles = message.mentions.roles.map(role => role.id);
+	const newRoleIds = message.mentions.roles.map(role => role.id);
 
 	if (args[0] === 'unset') {
 		config.guestRoleIds = null;
-	} else if (!newRoles) {
-		return message.channel.send('Role not found, make sure you tagged it correctly.');
+	} else if (!newRoleIds) {
+		return message.channel.send('Roles not found, make sure you tagged it correctly.');
 	} else {
-		config.guestRoleIds = newRoles.join();
+		config.guestRoleIds = newRoleIds.join(',');
 	}
 
 
-	axios.patch(`${process.env.API_URL}/config/`, config)
-		.catch(() => {
-			return message.channel.send('Unable to update guest role due to server error.');
-		});
+	const updated = ConfigService.updateConfig(config, message);
 
-	if (config.auditChannelId) {
-		client.channels.fetch(config.auditChannelId)
-			.then(channel => {
-				const audit = new MessageEmbed()
-					.setColor(EmbedColours.info)
-					.setAuthor(message.author.tag, message.author.displayAvatarURL())
-					.setDescription(`Guest roles ${!config.guestRoleIds ? 'Removed' : 'Updated'}`)
-					.setTimestamp();
+	if (updated) {
+		const audit = new MessageEmbed()
+			.setColor(EmbedColours.info)
+			.setAuthor(message.author.tag, message.author.displayAvatarURL())
+			.setDescription(`Guest roles ${!config.guestRoleIds ? 'Removed' : 'Updated'}`)
+			.setTimestamp();
 
-				if (!config.guestRoleIds) {
-					audit.addField('New Guest Roles', 'Not set');
-				} else {
-					audit.addField('New Guest Roles', message.mentions.roles.map(role => `@${role.name}`).join('\n'));
-				}
+		if (!config.guestRoleIds) {
+			audit.addField('New Guest Roles', 'Not set');
+		} else {
+			audit.addField('New Guest Roles', message.mentions.roles.map(role => role.toString()).join('\n'));
+		}
 
-				(channel as TextChannel).send(audit);
-			}).catch((err) => {
-				client.logger.writeError(err);
-			});
+		ChannelService.sendAuditMessage(client, config, audit);
 	}
 
-	if (config.guestRoleIds) {
+	if (updated && config.guestRoleIds) {
 		return message.channel.send('Guest User role(s) updated.');
-	} else {
+	} else if (updated) {
 		return message.channel.send('Guest User role removed.');
 	}
 
@@ -86,7 +76,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['text'],
+	channels: ['GUILD_TEXT'],
 	run: run
 };
 

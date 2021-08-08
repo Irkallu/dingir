@@ -1,12 +1,12 @@
-import { Message } from "discord.js";
-import { Command } from "../types/Command";
-import { ServerConfig } from "../types/ServerConfig";
+import { Message } from 'discord.js';
+import { Command } from '../types/Command';
+import { ServerConfig } from '../types/ServerConfig';
 
 export class CommandAccess {
 	hasAccess: boolean;
 	reason: string;
 
-	public verifyAccess (cmd: Command, message: Message, config: ServerConfig) {
+	public verifyAccess (cmd: Command, message: Message, config: ServerConfig): CommandAccess {
 		if (message.guild && cmd.channels.includes(message.channel.type)) {
 			if (!config) {
 				this.hasAccess = false;
