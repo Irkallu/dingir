@@ -13,7 +13,7 @@ class NovaClient extends Client {
 
 	public constructor() {
 		super ({ 
-			partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+			partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'GUILD_MEMBER'],
 			intents: [	Intents.FLAGS.GUILDS,
 						Intents.FLAGS.GUILD_MEMBERS,
 						Intents.FLAGS.GUILD_MESSAGES,

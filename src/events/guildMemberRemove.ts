@@ -8,6 +8,9 @@ import { UserProfileService } from '../utilities/UserProfileService';
 
 export const name = 'guildMemberRemove';
 export const run: RunFunction = async (client: NovaClient, member: GuildMember) => {
+	if (member.partial)
+		await member.fetch();
+	
 	if (member.user.bot) return;
 
 	const dataDeleted = await UserProfileService.deleteUser(member.guild.id, member.user.id);
