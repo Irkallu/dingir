@@ -78,7 +78,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			.then(() => {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.neutral)
-					.setAuthor(newMember.user.tag, newMember.user.displayAvatarURL())
+					.setAuthor({ name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL() })
 					.setDescription('Rules accepted by member.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();
@@ -87,7 +87,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			.catch(() => {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.negative)
-					.setAuthor(newMember.user.tag, newMember.user.displayAvatarURL())
+					.setAuthor({ name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL() })
 					.setDescription('Unable to provide guest role to user.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();

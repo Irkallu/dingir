@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, MessageEmbed, EmbedAuthorData } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
@@ -46,7 +46,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	if (updated) {
 		const audit = new MessageEmbed()
 			.setColor(EmbedColours.info)
-			.setAuthor(message.author.tag, message.author.displayAvatarURL())
+			.setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
 			.setDescription(`Guest roles ${!config.guestRoleIds ? 'Removed' : 'Updated'}`)
 			.setTimestamp();
 

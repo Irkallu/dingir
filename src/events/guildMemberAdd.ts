@@ -11,7 +11,7 @@ export const run: RunFunction = async (client: NovaClient, member: GuildMember) 
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.positive)
-		.setAuthor(member.user.tag, member.user.displayAvatarURL())
+		.setAuthor({ name: member.user.tag, iconURL: member.user.displayAvatarURL() })
 		.setDescription('New member joined')
 		.addField('ID', member.user.id)
 		.setTimestamp();

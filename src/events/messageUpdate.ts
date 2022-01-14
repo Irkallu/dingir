@@ -20,7 +20,7 @@ export const run: RunFunction = async (client: NovaClient, oldMessage: Message, 
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.neutral)
-		.setAuthor(newMessage.author.tag, newMessage.author.displayAvatarURL())
+		.setAuthor({ name: newMessage.author.tag, iconURL: newMessage.author.displayAvatarURL() })
 		.setDescription('A message was edited')
 		.addField('Previous', oldMessage.content)
 		.addField('Current', newMessage.content)

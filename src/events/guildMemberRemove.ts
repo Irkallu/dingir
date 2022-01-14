@@ -14,7 +14,7 @@ export const run: RunFunction = async (client: NovaClient, member: GuildMember) 
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.negative)
-		.setAuthor(member.user.tag, member.user.displayAvatarURL())
+		.setAuthor({ name: member.user.tag, iconURL: member.user.displayAvatarURL() })
 		.setDescription('Member left')
 		.addField('ID', member.user.id)
 		.addField('Member data deleted', dataDeleted ? 'Successful' : 'Failed')

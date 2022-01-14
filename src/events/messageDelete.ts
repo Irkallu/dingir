@@ -18,7 +18,7 @@ export const run: RunFunction = async (client: NovaClient, message: Message) => 
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.neutral)
-		.setAuthor(message.author.tag, message.author.displayAvatarURL())
+		.setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
 		.setDescription('A message was deleted')
 		.setTimestamp();
 
