@@ -1,9 +1,9 @@
-import { glob } from "glob";
-import { Client, Collection, Intents } from "discord.js";
-import { Command } from "../types/Command";
-import { promisify } from "util";
-import { Event } from "../types/Event";
-import { Logger } from "../utilities/Logger";
+import { glob } from 'glob';
+import { Client, Collection, Intents } from 'discord.js';
+import { Command } from '../types/Command';
+import { promisify } from 'util';
+import { Event } from '../types/Event';
+import { Logger } from '../utilities/Logger';
 
 const globPromise = promisify(glob);
 
@@ -15,15 +15,16 @@ class NovaClient extends Client {
 		super ({ 
 			partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'GUILD_MEMBER'],
 			intents: [	Intents.FLAGS.GUILDS,
-						Intents.FLAGS.GUILD_MEMBERS,
-						Intents.FLAGS.GUILD_MESSAGES,
-						Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-						Intents.FLAGS.DIRECT_MESSAGES ] 
-			});
+				Intents.FLAGS.GUILD_MEMBERS,
+				Intents.FLAGS.GUILD_MESSAGES,
+				Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+				Intents.FLAGS.DIRECT_MESSAGES ] 
+		});
 	}
 
 	public async start(): Promise<void> {
 		if (process.env.NODE_ENV !== 'production') {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			require('dotenv').config();
 		}
 

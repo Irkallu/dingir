@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, EmbedAuthorData } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
@@ -56,7 +56,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 			audit.addField('New Guest Roles', message.mentions.roles.map(role => role.toString()).join('\n'));
 		}
 
-		ChannelService.sendAuditMessage(client, config, audit);
+		await ChannelService.sendAuditMessage(client, config, audit);
 	}
 
 	if (updated && config.guestRoleIds) {

@@ -28,7 +28,7 @@ const runCommand = async (client: NovaClient, message: Message, config: ServerCo
 			});
 
 		if (cmd.deleteCmd) {
-			message.delete();
+			await message.delete();
 		}
 	}
 };
@@ -42,20 +42,21 @@ export const run: RunFunction = async (client: NovaClient, message: Message) => 
 	let serverConfig: ServerConfig | undefined;
 	if (message.guild) {
 		serverConfig = await ConfigService.getConfigByMessage(message);
-		UserProfileService.incrementActivityScore(message.guild.id, message.author.id);
+		await UserProfileService.incrementActivityScore(message.guild.id, message.author.id);
 		
 		if (serverConfig) {
 			if (!message.content.startsWith(serverConfig.prefix)) return;
 			const args = message.content.slice(serverConfig.prefix.length).trim().split(/ +/g);
 			const command = args.shift().toLowerCase();
 	
-			runCommand(client, message, serverConfig, command, args);
+			await runCommand(client, message, serverConfig, command, args);
 		}
 
 	} else if (!message.guild) {
 		const args = message.content.trim().split(/ +/g);
 		const command = args.shift().toLowerCase();
 
-		runCommand(client, message, serverConfig, command, args);
+		// noinspection JSUnusedAssignment
+		await runCommand(client, message, serverConfig, command, args);
 	}
 };

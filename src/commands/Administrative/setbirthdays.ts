@@ -10,7 +10,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 	config.birthdayCalendarMessagePath = `${birthdaysCalendar.channel.id}/${birthdaysCalendar.id}`;
 	const updated = await ConfigService.updateConfig(config, message);
 	if (updated)
-		BirthdayManager.populateCalendars(client, message.guild.id);
+		await BirthdayManager.populateCalendars(client, message.guild.id);
 };
 
 const command: Command = {

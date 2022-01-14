@@ -5,7 +5,7 @@ import { ServerConfig } from '../../types/ServerConfig';
 import { ConfigManager } from '../../utilities/ConfigManager';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
-	ConfigManager.updateChannel(config, message, 'auditChannelId', args);
+	await ConfigManager.updateChannel(config, message, 'auditChannelId', args);
 };
 
 const command: Command = {

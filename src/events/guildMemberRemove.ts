@@ -21,5 +21,5 @@ export const run: RunFunction = async (client: NovaClient, member: GuildMember) 
 		.setTimestamp();
 
 	const serverConfig = await ConfigService.getConfig(member.guild.id);
-	ChannelService.sendAuditMessage(client, serverConfig, audit);
+	await ChannelService.sendAuditMessage(client, serverConfig, audit);
 };

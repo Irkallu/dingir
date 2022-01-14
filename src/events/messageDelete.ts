@@ -14,7 +14,7 @@ export const run: RunFunction = async (client: NovaClient, message: Message) => 
 	const serverConfig = await ConfigService.getConfig(message.guild.id);
 	if (message.content.startsWith(serverConfig.prefix)) return;
 
-	UserProfileService.decrementActivityScore(message.guild.id, message.author.id);
+	await UserProfileService.decrementActivityScore(message.guild.id, message.author.id);
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.neutral)
@@ -29,5 +29,5 @@ export const run: RunFunction = async (client: NovaClient, message: Message) => 
 	if (message.attachments.size > 0)
 		audit.addField('Attachments', (message.attachments.size).toString());
 
-	ChannelService.sendAuditMessage(client, serverConfig, audit);
+	await ChannelService.sendAuditMessage(client, serverConfig, audit);
 };

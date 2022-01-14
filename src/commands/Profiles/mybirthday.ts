@@ -49,7 +49,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		return message.channel.send('There was a problem updating your user profile.');
 
 	message.channel.send(`I've set your next birthday to ${nextDate.toLocaleString(DateTime.DATE_FULL)}!`);
-	BirthdayManager.populateCalendars(client, message.guild.id);
+	await BirthdayManager.populateCalendars(client, message.guild.id);
 };
 
 const command: Command = {

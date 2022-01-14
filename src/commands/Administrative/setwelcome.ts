@@ -34,7 +34,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 		.addField('Old Welcome Message', !oldWelcome ? 'Not set' : oldWelcome)
 		.setTimestamp();
 
-	ChannelService.sendAuditMessage(client, config, audit);
+	await ChannelService.sendAuditMessage(client, config, audit);
 };
 
 const command: Command = {

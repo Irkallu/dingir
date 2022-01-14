@@ -27,5 +27,5 @@ export const run: RunFunction = async (client: NovaClient, oldMessage: Message, 
 		.setTimestamp();
 
 	const serverConfig = await ConfigService.getConfig(newMessage.guild.id);	
-	ChannelService.sendAuditMessage(client, serverConfig, audit);
+	await ChannelService.sendAuditMessage(client, serverConfig, audit);
 };

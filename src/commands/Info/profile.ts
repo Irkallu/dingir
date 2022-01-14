@@ -1,4 +1,4 @@
-import { UserProfile } from './../../types/UserProfile';
+import { UserProfile } from '../../types/UserProfile';
 import axios from 'axios';
 import { Message, MessageEmbed } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';

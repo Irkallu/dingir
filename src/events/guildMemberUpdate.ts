@@ -62,7 +62,7 @@ const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 
 	const attachment = new MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
 
-	member.guild.systemChannel.send({ content: welcomeMessage, files: [attachment] });
+	await member.guild.systemChannel.send({content: welcomeMessage, files: [attachment]});
 };
 
 export const name = 'guildMemberUpdate';
@@ -95,6 +95,6 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			});
 
 		if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl)
-			sendSystemMessage(serverConfig, newMember);
+			await sendSystemMessage(serverConfig, newMember);
 	}
 };

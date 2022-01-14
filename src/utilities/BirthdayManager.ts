@@ -36,19 +36,19 @@ export class BirthdayManager {
 
 		parsedConfigs = parsedConfigs.filter(config => config.birthdayCalendarMessagePath);
 
-		parsedConfigs.forEach(async (config) => {
+		for (const config of parsedConfigs) {
 			const profiles = await UserProfileService.getServerBirthdays(config.serverId);
 			const [channelId, messageId] = config.birthdayCalendarMessagePath.split('/');
 			let messageContent = (':tada: ~ Upcoming Birthdays ~ :tada:\n');
 
 			const chanToEdit = await client.channels.fetch(channelId);
 			if (!chanToEdit)
-				return Logger.writeError(`Could not find birthday channel for server ${config.serverId}`);
+				Logger.writeError(`Could not find birthday channel for server ${config.serverId}`);
 
 			const birthdayMessage = await (chanToEdit as TextChannel).messages.fetch(messageId);
 			if (!birthdayMessage)
-				return Logger.writeError(`Could not find birthday message for server ${config.serverId}`);
-				
+				Logger.writeError(`Could not find birthday message for server ${config.serverId}`);
+
 			if (profiles.length < 1) {
 				messageContent += ('-------------');
 				messageContent += (`There are no birthdays in this server, set yours with \`${config.prefix}mybirthday\``);
@@ -95,8 +95,8 @@ export class BirthdayManager {
 				}
 			}
 
-			birthdayMessage.edit({content: messageContent, allowedMentions: { 'users' : []}});
-		});
+			await birthdayMessage.edit({content: messageContent, allowedMentions: { 'users' : []}});
+		}
 
 		Logger.writeLog('Finished birthday calendar update job.');
 	}

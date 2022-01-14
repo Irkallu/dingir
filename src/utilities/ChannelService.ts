@@ -11,7 +11,7 @@ export class ChannelService {
 		if (!auditChannel || !auditChannel.isText)
 			return;
 
-		(auditChannel as TextChannel)
+		await (auditChannel as TextChannel)
 			.send({ embeds: [embed]  });
 	}
 }
