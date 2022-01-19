@@ -4,8 +4,8 @@ import { Command } from '../../types/Command';
 import { ServerConfig } from '../../types/ServerConfig';
 import { ConfigManager } from '../../utilities/ConfigManager';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
-	await ConfigManager.updateChannel(config, message, 'announcementsChannelId', args);
+const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
+	await ConfigManager.updateChannel(config, message, 'announcementsChannelId');
 };
 
 const command: Command = {

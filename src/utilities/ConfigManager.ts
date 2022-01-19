@@ -3,13 +3,13 @@ import { ServerConfig } from '../types/ServerConfig';
 import { ConfigService } from './ConfigService';
 
 export class ConfigManager {
-	public static async updateChannel (serverConfig: ServerConfig, message: Message, field: string, args: any[]): Promise<Message> {
+	public static async updateChannel (serverConfig: ServerConfig, message: Message, field: string): Promise<Message> {
 		const chan = message.mentions.channels.first();
 
 		let messageContent: string;
-		if(args.length === 0 && serverConfig[field]) {
+		if(!chan && serverConfig[field]) {
 			serverConfig[field] = null;
-		} else if (args.length === 0 && !serverConfig[field]) {
+		} else if (!chan && !serverConfig[field]) {
 			messageContent = 'Please tag the channel.';
 		} else if (!chan) {
 			messageContent = 'Channel not found, or I do not have permission to access it.';
@@ -21,7 +21,9 @@ export class ConfigManager {
 			return message.channel.send({ content: messageContent });
 		}
     
-		serverConfig[field] = chan.id;
+		if (chan) {
+			serverConfig[field] = chan.id;
+		}
 
 		const updated = ConfigService.updateConfig(serverConfig, message);
     
