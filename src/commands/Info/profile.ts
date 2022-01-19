@@ -24,7 +24,7 @@ const run = async (client: NovaClient, message: Message): Promise<any> => {
 		.addField('Nickname', mem.nickname ? mem.nickname : 'Not set')
 		.addField('User tag', mem.user.tag)
 		.addField('Joined', `<t:${Math.floor(mem.joinedTimestamp/1000)}:R>`)
-		.addField('Pending', mem.pending ? 'Not screened' : 'Passed screen')
+		.addField('Screening', mem.pending ? 'Not completed' : 'Passed')
 		.addField('Activity Score', userProfile ? userProfile.activityScore.toString() : 'Not found')
 		.addField('ID', mem.user.id);
 
