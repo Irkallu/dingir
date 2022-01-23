@@ -22,7 +22,7 @@ jobs:
         with:
           push: true
           platforms: linux/arm64
-          tags: ghcr.io/irkallum/dingir:latest
+          tags: ghcr.io/irkallu/dingir:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
