@@ -57,7 +57,7 @@ const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 	ctx.closePath();
 	ctx.clip();
 
-	const avatar = await loadImage(member.user.displayAvatarURL({ format: 'jpg' }));
+	const avatar = await loadImage(member.displayAvatarURL({ format: 'jpg' }));
 	ctx.drawImage(avatar, 50, 50, 150, 150);
 
 	const attachment = new MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
@@ -78,7 +78,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			.then(() => {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.neutral)
-					.setAuthor({ name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL() })
+					.setAuthor({ name: newMember.user.tag, iconURL: newMember.displayAvatarURL() })
 					.setDescription('Rules accepted by member.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();
@@ -87,7 +87,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			.catch(() => {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.negative)
-					.setAuthor({ name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL() })
+					.setAuthor({ name: newMember.user.tag, iconURL: newMember.displayAvatarURL() })
 					.setDescription('Unable to provide guest role to user.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();

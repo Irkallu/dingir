@@ -16,7 +16,7 @@ const run = async (client: NovaClient, message: Message): Promise<any> => {
 	const userProfile = res.data as UserProfile;
 
 	const embed = new MessageEmbed()
-		.setThumbnail((mem.user.displayAvatarURL()))
+		.setThumbnail((mem.displayAvatarURL()))
 		.setColor(EmbedColours.info)
 		.setTitle('User Profile')
 		.setTimestamp()
