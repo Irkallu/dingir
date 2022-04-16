@@ -23,7 +23,9 @@ const applyText = (canvas: Canvas, text: string, baseSize: number, weight: strin
 const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 	const welcomeMessage = config.welcomeMessage.replace('{member}', `<@${member.id}>`);
 
-	registerFont(`${__dirname}/../resources/fonts/Roboto-Regular.ttf`, { family: 'Roboto', weight: 'regular'});
+	registerFont(`${__dirname}/../resources/fonts/Roboto-Regular.ttf`, {
+		family: 'Roboto', weight: 'regular'
+	});
 
 	const canvas = createCanvas(700, 250);
 	const ctx = canvas.getContext('2d');
@@ -57,12 +59,16 @@ const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 	ctx.closePath();
 	ctx.clip();
 
-	const avatar = await loadImage(member.displayAvatarURL({ format: 'jpg' }));
+	const avatar = await loadImage(member.displayAvatarURL({
+		format: 'jpg' 
+	}));
 	ctx.drawImage(avatar, 50, 50, 150, 150);
 
 	const attachment = new MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
 
-	await member.guild.systemChannel.send({content: welcomeMessage, files: [attachment]});
+	await member.guild.systemChannel.send({
+		content: welcomeMessage, files: [attachment]
+	});
 };
 
 export const name = 'guildMemberUpdate';
@@ -78,19 +84,24 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			.then(async () => {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.neutral)
-					.setAuthor({ name: newMember.user.tag, iconURL: newMember.displayAvatarURL() })
+					.setAuthor({
+						name: newMember.user.tag, iconURL: newMember.displayAvatarURL() 
+					})
 					.setDescription('Rules accepted by member.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();
 				await ChannelService.sendAuditMessage(client, serverConfig, audit);
 
-				if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl)
-					sendSystemMessage(serverConfig, newMember);
+				if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl) {
+					await sendSystemMessage(serverConfig, newMember);
+				}
 			})
 			.catch(() => {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.negative)
-					.setAuthor({ name: newMember.user.tag, iconURL: newMember.displayAvatarURL() })
+					.setAuthor({
+						name: newMember.user.tag, iconURL: newMember.displayAvatarURL() 
+					})
 					.setDescription('Unable to provide guest role to user.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();

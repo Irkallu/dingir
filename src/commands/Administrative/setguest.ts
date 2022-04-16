@@ -26,7 +26,9 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 			.setDescription(currentGuestRoles.join('\n'))
 			.setTimestamp();
 
-		return message.channel.send({ embeds: [embed] });
+		return message.channel.send({
+			embeds: [embed] 
+		});
 	}
 
 	const newRoleIds = message.mentions.roles.map(role => role.id);
@@ -44,7 +46,9 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.info)
-		.setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
+		.setAuthor({
+			name: message.author.tag, iconURL: message.author.displayAvatarURL() 
+		})
 		.setDescription(`Guest roles ${!config.guestRoleIds ? 'Removed' : 'Updated'}`)
 		.setTimestamp();
 

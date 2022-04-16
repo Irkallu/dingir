@@ -3,7 +3,10 @@ import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
 
 const run = async (client: NovaClient, message: Message): Promise<any> => {
-	const oldMemberMock = Object.assign({}, (message.mentions.members.first() ?? message.member), { pending: true });
+	const oldMemberMock = Object.assign({
+	}, (message.mentions.members.first() ?? message.member), {
+		pending: true 
+	});
 	const newMemberMock = message.mentions.members.first() ?? message.member;
 
 	client.emit('guildMemberUpdate', oldMemberMock, newMemberMock);

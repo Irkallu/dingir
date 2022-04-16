@@ -5,8 +5,12 @@ export class UserProfileService {
 	public static async getAllBirthdays (): Promise<UserProfile[]> {
 		return await UserProfile.findAll({
 			where: {
-				birthdayDay: {[Op.not]: null},
-				birthdayMonth: {[Op.not]: null}
+				birthdayDay: {
+					[Op.not]: null
+				},
+				birthdayMonth: {
+					[Op.not]: null
+				}
 			}
 		});
 	}
@@ -14,8 +18,12 @@ export class UserProfileService {
 	public static async getServerBirthdays (serverId: string): Promise<UserProfile[]> {
 		return await UserProfile.findAll({
 			where: {
-				birthdayDay: {[Op.not]: null},
-				birthdayMonth: {[Op.not]: null},
+				birthdayDay: {
+					[Op.not]: null
+				},
+				birthdayMonth: {
+					[Op.not]: null
+				},
 				serverId: serverId
 			}
 		});

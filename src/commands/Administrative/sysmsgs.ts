@@ -8,7 +8,9 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 
 	await config.save();
 
-	return message.channel.send({ content: `System messages ${config.systemMessagesEnabled ? 'Enabled' : 'Disabled'} for ${message.guild.name}.`});
+	return message.channel.send({
+		content: `System messages ${config.systemMessagesEnabled ? 'Enabled' : 'Disabled'} for ${message.guild.name}.`
+	});
 };
 
 const command: Command = {

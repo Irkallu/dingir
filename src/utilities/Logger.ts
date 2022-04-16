@@ -7,7 +7,8 @@ export class Logger {
 
 	public static writeError (log: string, error?: string): void {
 		console.error(`[${DateTime.local().toLocaleString(DateTime.DATETIME_SHORT)}]: ${log}`);
-		if (error) 
+		if (error) {
 			console.error(`[${DateTime.local().toLocaleString(DateTime.DATETIME_SHORT)}]: ${error}`);
+		}
 	}
 }

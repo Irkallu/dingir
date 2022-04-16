@@ -30,6 +30,20 @@
 			"error",
 			"always"
 		],
+		"brace-style": "error",
+		"curly": [
+			"error",
+			"all"
+		],
+		"object-curly-newline": [
+			"error", {
+				"ObjectExpression": "always",
+				"ObjectPattern": "always",
+				"ImportDeclaration": "never",
+				"ExportDeclaration": "never"
+
+			}
+		],
 		"@typescript-eslint/no-explicit-any": "off"
 	}
 }

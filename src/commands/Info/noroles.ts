@@ -16,13 +16,18 @@ const run = async (client: NovaClient, message: Message): Promise<any> => {
 	} else {
 		response = '**Users with no roles**\n------\n';
 		members.each(async (mem) => {
-			if (mem.partial)
+			if (mem.partial) {
 				await mem.fetch();
+			}
 			response += `${mem.toString()} joined <t:${Math.floor(mem.joinedTimestamp/1000)}:R>\n`;
 		});
 	}
 
-	return message.channel.send({ content: response, allowedMentions: { 'parse': []} });
+	return message.channel.send({
+		content: response, allowedMentions: {
+			'parse': []
+		} 
+	});
 };
 
 const command: Command = {

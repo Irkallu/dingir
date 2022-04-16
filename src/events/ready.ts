@@ -7,7 +7,9 @@ import { Logger } from '../utilities/Logger';
 
 export const name = 'ready';
 export const run: RunFunction = async (client: NovaClient) => {
-	client.user.setPresence({ status: 'online' });
+	client.user.setPresence({
+		status: 'online' 
+	});
 
 	Logger.writeLog('Online');
 	const birthdaySchedule = schedule.scheduleJob(process.env.JOB_SCHEDULE, () => {

@@ -8,13 +8,17 @@ import { UserProfileService } from '../utilities/UserProfileService';
 
 export const name = 'guildMemberRemove';
 export const run: RunFunction = async (client: NovaClient, member: GuildMember) => {
-	if (member.user.bot) return;
+	if (member.user.bot) {
+		return;
+	}
 
 	const dataDeleted = await UserProfileService.deleteUser(member.guild.id, member.user.id);
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.negative)
-		.setAuthor({ name: member.user.tag, iconURL: member.displayAvatarURL() })
+		.setAuthor({
+			name: member.user.tag, iconURL: member.displayAvatarURL() 
+		})
 		.setDescription('Member left')
 		.addField('ID', member.user.id)
 		.addField('Member data deleted', dataDeleted ? 'Successful' : 'Failed')

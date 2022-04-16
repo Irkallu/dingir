@@ -27,7 +27,9 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.neutral)
-		.setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
+		.setAuthor({
+			name: message.author.tag, iconURL: message.author.displayAvatarURL() 
+		})
 		.setDescription(`Welcome Message ${!config.welcomeMessage ? 'Removed' : 'Updated'}`)
 		.addField('New Welcome Message', !config.welcomeMessage ? 'Not set' : config.welcomeMessage)
 		.addField('Old Welcome Message', !oldWelcome ? 'Not set' : oldWelcome)
