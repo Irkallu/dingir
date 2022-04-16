@@ -5,8 +5,9 @@ import { Command } from '../../types/Command';
 import { ServerConfig } from '../../client/models/ServerConfig';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
-	if (args.length < 2) 
+	if (args.length < 2) {
 		return message.channel.send(`Please provide the required arguments: \`${config.prefix}${command.usage}\``);
+	}
 
 	const days = args[0];
 	const role = message.mentions.roles.first();
@@ -31,13 +32,18 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	} else {
 		response = `**Users in ${role.toString()} that have been in the server for at least ${days ?? 0} days.**\n------\n`;
 		members.each(async (mem) => {
-			if (mem.partial)
+			if (mem.partial) {
 				await mem.fetch();
+			}
 			response += `${mem.toString()} joined <t:${Math.floor(mem.joinedTimestamp/1000)}:R>\n`;
 		});
 	}
 
-	return message.channel.send({ content: response, allowedMentions: { 'parse': []} });
+	return message.channel.send({
+		content: response, allowedMentions: {
+			'parse': []
+		} 
+	});
 };
 
 const command: Command = {

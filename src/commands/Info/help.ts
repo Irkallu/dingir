@@ -33,12 +33,15 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	embed.addField('Title', cmd.title);
 	embed.addField('Description', cmd.description);
 	embed.addField('Access', cmd.admin  ? 'Admin only' : cmd.limited ? 'Limited' : 'Everyone');
-	if (cmd.limited)
+	if (cmd.limited) {
 		embed.addField('Limitation', cmd.limitation);
+	}
 	embed.addField('Usage', config ? config.prefix + cmd.usage : cmd.usage);
 	embed.addField('Example', config ? config.prefix + cmd.example : cmd.example);
 
-	return message.channel.send({ embeds: [embed] });
+	return message.channel.send({
+		embeds: [embed] 
+	});
 };
 
 const command: Command = {

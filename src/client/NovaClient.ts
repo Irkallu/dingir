@@ -29,7 +29,9 @@ class NovaClient extends Client {
 			require('dotenv').config();
 		}
 
-		await sequelize.sync({ alter: true });
+		await sequelize.sync({
+			alter: true 
+		});
 
 		const commandFiles: string[] = await globPromise(
 			`${__dirname}/../commands/**/*{.js,.ts}`

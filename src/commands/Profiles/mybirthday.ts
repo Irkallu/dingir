@@ -18,8 +18,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 
 	const now = DateTime.local();
 
-	if(!now.isInLeapYear && day === 29 && month === 2)
-	{
+	if(!now.isInLeapYear && day === 29 && month === 2) {
 		day--;
 		alteredForLeap = true;
 	}
@@ -27,9 +26,13 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	let nextDate = DateTime.local(now.year, month, day);
 
 	if (nextDate <= now){
-		nextDate = nextDate.plus({year: 1});
+		nextDate = nextDate.plus({
+			year: 1
+		});
 		if (nextDate.isInLeapYear && alteredForLeap){
-			nextDate = nextDate.plus({day: 1});
+			nextDate = nextDate.plus({
+				day: 1
+			});
 		}
 	}
 	
@@ -38,8 +41,9 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	}
 
 	const userProfile = await UserProfileService.getUserProfile(message.guild.id, message.author.id);
-	if (!userProfile)
+	if (!userProfile) {
 		return message.channel.send('There was a problem getting your user profile.');
+	}
 
 	userProfile.birthdayDay = day;
 	userProfile.birthdayMonth = month;

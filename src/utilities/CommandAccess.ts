@@ -32,8 +32,7 @@ export class CommandAccess {
 				this.hasAccess = false;
 				this.reason = 'There is a permissions related error executing this command.';
 			}
-		}
-		else if (cmd.channels.includes(message.channel.type)) {
+		} else if (cmd.channels.includes(message.channel.type)) {
 			this.hasAccess = true;
 		} else {
 			this.hasAccess = false;

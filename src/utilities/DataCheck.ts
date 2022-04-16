@@ -1,5 +1,4 @@
 import _ from 'underscore';
-import { UserProfile } from '../client/models/UserProfile';
 import { NovaClient } from '../client/NovaClient';
 import { ConfigService } from './ConfigService';
 import { Logger } from './Logger';
@@ -26,10 +25,11 @@ export class DataCheck {
 				const users = await UserProfileService.getServerBirthdays(guild.id);
 				const guildUsers = await guild.members.fetch();
 
-				users.forEach(async (u: UserProfile) => {
-					if(!guildUsers.find(gu => gu.user.id === u.userId))
+				for (const u of users) {
+					if(!guildUsers.find(gu => gu.user.id === u.userId)) {
 						await UserProfileService.deleteUser(u.serverId, u.userId);
-				});
+					}
+				}
 			}
 		}
 

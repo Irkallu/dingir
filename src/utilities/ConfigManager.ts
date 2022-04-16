@@ -17,7 +17,9 @@ export class ConfigManager {
 		} 
 
 		if (messageContent) {
-			return message.channel.send({ content: messageContent });
+			return message.channel.send({
+				content: messageContent 
+			});
 		}
     
 		if (chan) {
@@ -27,9 +29,13 @@ export class ConfigManager {
 		await serverConfig.save();
     
 		if (serverConfig[field]) {
-			return message.channel.send({ content: `Channel updated to ${chan.toString()}.` });
+			return message.channel.send({
+				content: `Channel updated to ${chan.toString()}.` 
+			});
 		} else {
-			return message.channel.send({ content: 'Channel disabled.' });
+			return message.channel.send({
+				content: 'Channel disabled.' 
+			});
 		}
 	}
 }

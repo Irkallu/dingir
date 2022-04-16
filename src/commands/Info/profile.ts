@@ -26,7 +26,9 @@ const run = async (client: NovaClient, message: Message): Promise<any> => {
 		.addField('Activity Score', userProfile ? userProfile.activityScore.toString() : 'Not found')
 		.addField('ID', mem.user.id);
 
-	return message.channel.send({ embeds: [embed] });
+	return message.channel.send({
+		embeds: [embed] 
+	});
 };
 
 const command: Command = {

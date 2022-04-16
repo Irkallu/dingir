@@ -1,5 +1,5 @@
 import { CommandAccess } from '../utilities/CommandAccess';
-import {  Message } from 'discord.js';
+import { Message } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { RunFunction } from '../types/Event';
 import { ConfigService } from '../utilities/ConfigService';
@@ -13,7 +13,9 @@ const runCommand = async (client: NovaClient, message: Message, config: ServerCo
 
 	const cmd = client.commands.get(command);
 
-	if (!cmd) return;
+	if (!cmd) {
+		return;
+	}
 
 	const commandAccess = new CommandAccess();
 	const access = commandAccess.verifyAccess(cmd, message, config);
@@ -34,10 +36,13 @@ const runCommand = async (client: NovaClient, message: Message, config: ServerCo
 };
 
 export const run: RunFunction = async (client: NovaClient, message: Message) => {
-	if (message.partial)
+	if (message.partial) {
 		await message.fetch();
+	}
 
-	if (message.author.bot) return;
+	if (message.author.bot) {
+		return;
+	}
 
 	let serverConfig: ServerConfig | undefined;
 	if (message.guild) {
@@ -45,7 +50,9 @@ export const run: RunFunction = async (client: NovaClient, message: Message) => 
 		await UserProfileService.incrementActivityScore(message.guild.id, message.author.id);
 		
 		if (serverConfig) {
-			if (!message.content.startsWith(serverConfig.prefix)) return;
+			if (!message.content.startsWith(serverConfig.prefix)) {
+				return;
+			}
 			const args = message.content.slice(serverConfig.prefix.length).trim().split(/ +/g);
 			const command = args.shift().toLowerCase();
 	

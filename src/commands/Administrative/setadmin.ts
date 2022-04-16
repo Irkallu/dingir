@@ -6,7 +6,9 @@ import { ServerConfig } from '../../client/models/ServerConfig';
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (config.adminRoleId) {
 		if (!message.member.roles.cache.has(config.adminRoleId)) {
-			return message.channel.send({ content: 'You do not have the required permissions for this command.' });
+			return message.channel.send({
+				content: 'You do not have the required permissions for this command.' 
+			});
 		}
 	}
 
@@ -14,18 +16,26 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	if (args.length === 0 && config.adminRoleId) {
 		config.adminRoleId = null;
 	} else if (args.length === 0 && !config.adminRoleId) {
-		return message.channel.send({ content: 'Please tag a role to set as admin.' });
+		return message.channel.send({
+			content: 'Please tag a role to set as admin.' 
+		});
 	} else if (!newRole) {
-		return message.channel.send({ content: 'Role not found, make sure you tagged it correctly.' });
+		return message.channel.send({
+			content: 'Role not found, make sure you tagged it correctly.' 
+		});
 	} else {
 		config.adminRoleId = newRole.id;
 	}
 
 	await config.save();
 	if (config.adminRoleId) {
-		return message.channel.send({ content: `Admin role updated to ${newRole.name} for ${message.guild.name}.` });
+		return message.channel.send({
+			content: `Admin role updated to ${newRole.name} for ${message.guild.name}.` 
+		});
 	} else {
-		return message.channel.send({ content: `Admin role removed for ${message.guild.name}.` });
+		return message.channel.send({
+			content: `Admin role removed for ${message.guild.name}.` 
+		});
 	}
 };
 

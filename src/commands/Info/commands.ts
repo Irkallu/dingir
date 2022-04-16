@@ -15,11 +15,14 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 	client.commands.forEach((cmd: Command) => {
 		const commandAccess = new CommandAccess();
 		const access = commandAccess.verifyAccess(cmd, message, config);
-		if (access.hasAccess)
+		if (access.hasAccess) {
 			embed.addField(config ? config.prefix + cmd.usage : cmd.usage, cmd.description);
+		}
 	});
 
-	return message.channel.send({ embeds: [embed] });
+	return message.channel.send({
+		embeds: [embed] 
+	});
 };
 
 const command: Command = {

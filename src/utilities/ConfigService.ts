@@ -4,7 +4,9 @@ import { ServerConfig } from '../client/models/ServerConfig';
 export class ConfigService {
 	public static async getConfigByMessage (message: Message): Promise<ServerConfig | undefined> {
 		const [ config ] = await ServerConfig.findOrCreate({
-			where: { serverId: message.guild.id }
+			where: {
+				serverId: message.guild.id 
+			}
 		});
 
 		return config;
@@ -12,7 +14,9 @@ export class ConfigService {
 
 	public static async getConfig (serverId: string): Promise<ServerConfig> {
 		const [ config ] = await ServerConfig.findOrCreate({
-			where: { serverId: serverId }
+			where: {
+				serverId: serverId 
+			}
 		});
 
 		return config;
@@ -24,7 +28,9 @@ export class ConfigService {
 
 	public static async deleteConfig(serverId: string): Promise<boolean> {
 		const recordsDeleted = await ServerConfig.destroy({
-			where: { serverId: serverId }
+			where: {
+				serverId: serverId 
+			}
 		});
 
 		return recordsDeleted > 0;

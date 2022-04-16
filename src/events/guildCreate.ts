@@ -8,8 +8,9 @@ export const name = 'guildCreate';
 export const run: RunFunction = async (client: NovaClient, guild: Guild) => {
 	ConfigService.getConfig(guild.id)
 		.then(config => {
-			if (config)
+			if (config) {
 				return Logger.writeLog(`Bot added to new guild: ${guild.name} (${guild.id}).`);
+			}
 			return Logger.writeError(`Bot added to new guild, but config could not be generated: ${guild.name} (${guild.id}).`);
 		})
 		.catch (err => {

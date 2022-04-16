@@ -8,7 +8,9 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 
 	await config.save();
 
-	return message.channel.send({ content: `Prefix set to '${config.prefix}' for ${message.guild.name}.`});
+	return message.channel.send({
+		content: `Prefix set to '${config.prefix}' for ${message.guild.name}.`
+	});
 };
 
 const command: Command = {
