@@ -1,16 +1,14 @@
 import { Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
-import { ConfigService } from '../../utilities/ConfigService';
+import { ServerConfig } from '../../client/models/ServerConfig';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	config.systemMessagesEnabled = !config.systemMessagesEnabled;
 
-	const updated: boolean = await ConfigService.updateConfig(config, message);
+	await config.save();
 
-	if (updated)
-		return message.channel.send({ content: `System messages ${config.systemMessagesEnabled ? 'Enabled' : 'Disabled'} for ${message.guild.name}.`});
+	return message.channel.send({ content: `System messages ${config.systemMessagesEnabled ? 'Enabled' : 'Disabled'} for ${message.guild.name}.`});
 };
 
 const command: Command = {

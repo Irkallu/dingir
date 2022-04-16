@@ -3,7 +3,9 @@ import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
 
 const run = async (client: NovaClient, message: Message): Promise<any> => {
-	const members = message.guild.members.cache.filter(member => 
+	const allMembers = await message.guild.members.fetch();
+	
+	const members = allMembers.filter(member => 
 		member.roles.cache.size === 1
 	);
 

@@ -205,3 +205,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/node,react,linux,windows,webstorm
+
+# Custom ignores
+data/

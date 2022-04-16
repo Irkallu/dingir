@@ -1,6 +1,6 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
+import { ServerConfig } from '../client/models/ServerConfig';
 import { NovaClient } from '../client/NovaClient';
-import { ServerConfig } from '../types/ServerConfig';
 
 export class ChannelService {
 	public static async sendAuditMessage (client: NovaClient, serverConfig: ServerConfig, embed: MessageEmbed): Promise<boolean> {

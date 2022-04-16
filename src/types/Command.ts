@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
+import { ServerConfig } from '../client/models/ServerConfig';
 import { NovaClient } from '../client/NovaClient';
-import { ServerConfig } from './ServerConfig';
 
 export interface Command {
 	name: string,

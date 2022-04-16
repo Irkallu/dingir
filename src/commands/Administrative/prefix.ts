@@ -1,16 +1,14 @@
 import { Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
-import { ConfigService } from '../../utilities/ConfigService';
+import { ServerConfig } from '../../client/models/ServerConfig';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	config.prefix = args[0];
 
-	const updated: boolean = await ConfigService.updateConfig(config, message);
+	await config.save();
 
-	if (updated)
-		return message.channel.send({ content: `Prefix set to '${config.prefix}' for ${message.guild.name}.`});
+	return message.channel.send({ content: `Prefix set to '${config.prefix}' for ${message.guild.name}.`});
 };
 
 const command: Command = {

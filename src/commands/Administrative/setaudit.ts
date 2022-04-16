@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
+import { ServerConfig } from '../../client/models/ServerConfig';
 import { ConfigManager } from '../../utilities/ConfigManager';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {

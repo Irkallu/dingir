@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
+import { ServerConfig } from '../../client/models/ServerConfig';
 import { CommandAccess } from '../../utilities/CommandAccess';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {

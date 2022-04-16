@@ -2,10 +2,10 @@ import { CommandAccess } from '../utilities/CommandAccess';
 import {  Message } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { RunFunction } from '../types/Event';
-import { ServerConfig } from '../types/ServerConfig';
 import { ConfigService } from '../utilities/ConfigService';
 import { Logger } from '../utilities/Logger';
 import { UserProfileService } from '../utilities/UserProfileService';
+import { ServerConfig } from '../client/models/ServerConfig';
 
 export const name = 'messageCreate';
 
@@ -56,7 +56,6 @@ export const run: RunFunction = async (client: NovaClient, message: Message) => 
 		const args = message.content.trim().split(/ +/g);
 		const command = args.shift().toLowerCase();
 
-		// noinspection JSUnusedAssignment
 		await runCommand(client, message, serverConfig, command, args);
 	}
 };

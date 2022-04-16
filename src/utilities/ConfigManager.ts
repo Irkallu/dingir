@@ -1,6 +1,5 @@
 import { Message } from 'discord.js';
-import { ServerConfig } from '../types/ServerConfig';
-import { ConfigService } from './ConfigService';
+import { ServerConfig } from '../client/models/ServerConfig';
 
 export class ConfigManager {
 	public static async updateChannel (serverConfig: ServerConfig, message: Message, field: string): Promise<Message> {
@@ -25,11 +24,11 @@ export class ConfigManager {
 			serverConfig[field] = chan.id;
 		}
 
-		const updated = ConfigService.updateConfig(serverConfig, message);
+		await serverConfig.save();
     
-		if (updated && serverConfig[field]) {
+		if (serverConfig[field]) {
 			return message.channel.send({ content: `Channel updated to ${chan.toString()}.` });
-		} else if (updated) {
+		} else {
 			return message.channel.send({ content: 'Channel disabled.' });
 		}
 	}

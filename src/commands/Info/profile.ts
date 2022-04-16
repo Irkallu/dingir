@@ -1,9 +1,8 @@
-import { UserProfile } from '../../types/UserProfile';
-import axios from 'axios';
 import { Message, MessageEmbed } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
+import { UserProfileService } from '../../utilities/UserProfileService';
 
 const run = async (client: NovaClient, message: Message): Promise<any> => {
 	const mem = message.mentions.members.first();
@@ -12,8 +11,7 @@ const run = async (client: NovaClient, message: Message): Promise<any> => {
 		return message.channel.send('Unable to find that member, or a member was not provided.');
 	}
 
-	const res = await axios.get(`${process.env.API_URL}/users/profile/${message.guild.id}/${mem.user.id}`);
-	const userProfile = res.data as UserProfile;
+	const userProfile = await UserProfileService.getUserProfile(message.guild.id, mem.user.id);
 
 	const embed = new MessageEmbed()
 		.setThumbnail((mem.displayAvatarURL()))

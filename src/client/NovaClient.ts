@@ -4,6 +4,7 @@ import { Command } from '../types/Command';
 import { promisify } from 'util';
 import { Event } from '../types/Event';
 import { Logger } from '../utilities/Logger';
+import { sequelize } from './database/sequelize';
 
 const globPromise = promisify(glob);
 
@@ -27,6 +28,8 @@ class NovaClient extends Client {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			require('dotenv').config();
 		}
+
+		await sequelize.sync({ alter: true });
 
 		const commandFiles: string[] = await globPromise(
 			`${__dirname}/../commands/**/*{.js,.ts}`

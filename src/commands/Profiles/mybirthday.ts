@@ -3,8 +3,8 @@ import { Command } from '../../types/Command';
 import { BirthdayManager } from '../../utilities/BirthdayManager';
 import { NovaClient } from '../../client/NovaClient';
 import { Message } from 'discord.js';
-import { ServerConfig } from '../../types/ServerConfig';
 import { UserProfileService } from '../../utilities/UserProfileService';
+import { ServerConfig } from '../../client/models/ServerConfig';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if(args.length < 1) {
@@ -34,7 +34,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	}
 	
 	if (!nextDate.isValid) {
-		return message.channel.send('Looks like that date was invalid, make sure it is in the format of day/month');
+		return message.channel.send('It looks like that date was invalid, make sure it is in the format of day/month');
 	}
 
 	const userProfile = await UserProfileService.getUserProfile(message.guild.id, message.author.id);
@@ -44,9 +44,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	userProfile.birthdayDay = day;
 	userProfile.birthdayMonth = month;
 
-	const updatedProfile = await UserProfileService.updateUserProfile(userProfile);
-	if (!updatedProfile)
-		return message.channel.send('There was a problem updating your user profile.');
+	await userProfile.save();
 
 	message.channel.send(`I've set your next birthday to ${nextDate.toLocaleString(DateTime.DATE_FULL)}!`);
 	await BirthdayManager.populateCalendars(client, message.guild.id);

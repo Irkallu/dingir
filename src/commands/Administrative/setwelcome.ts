@@ -2,9 +2,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
+import { ServerConfig } from '../../client/models/ServerConfig';
 import { ChannelService } from '../../utilities/ChannelService';
-import { ConfigService } from '../../utilities/ConfigService';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	const newWelcome = message.content.slice(config.prefix.length + command.name.length).trim();
@@ -24,7 +23,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 		config.welcomeMessage = newWelcome;
 	}
 
-	await ConfigService.updateConfig(config, message);
+	await config.save();
 
 	const audit = new MessageEmbed()
 		.setColor(EmbedColours.neutral)

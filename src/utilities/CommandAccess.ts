@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
+import { ServerConfig } from '../client/models/ServerConfig';
 import { Command } from '../types/Command';
-import { ServerConfig } from '../types/ServerConfig';
 
 export class CommandAccess {
 	hasAccess: boolean;

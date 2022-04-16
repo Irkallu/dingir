@@ -6,7 +6,7 @@ import { ChannelService } from '../utilities/ChannelService';
 import { ConfigService } from '../utilities/ConfigService';
 import { Canvas, registerFont, createCanvas, loadImage } from 'canvas';
 import { DateTime } from 'luxon';
-import { ServerConfig } from '../types/ServerConfig';
+import { ServerConfig } from '../client/models/ServerConfig';
 
 const applyText = (canvas: Canvas, text: string, baseSize: number, weight: string) => {
 	const ctx = canvas.getContext('2d');
@@ -74,15 +74,18 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 		const guildRoles = await newMember.guild.roles.fetch();
 		const guildMember = await newMember.guild.members.fetch(newMember.user.id);
 	
-		guildMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)))
-			.then(() => {
+		await guildMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)))
+			.then(async () => {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.neutral)
 					.setAuthor({ name: newMember.user.tag, iconURL: newMember.displayAvatarURL() })
 					.setDescription('Rules accepted by member.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();
-				return ChannelService.sendAuditMessage(client, serverConfig, audit);
+				await ChannelService.sendAuditMessage(client, serverConfig, audit);
+
+				if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl)
+					sendSystemMessage(serverConfig, newMember);
 			})
 			.catch(() => {
 				const audit = new MessageEmbed()
@@ -94,7 +97,6 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 				return ChannelService.sendAuditMessage(client, serverConfig, audit);
 			});
 
-		if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl)
-			await sendSystemMessage(serverConfig, newMember);
+		
 	}
 };

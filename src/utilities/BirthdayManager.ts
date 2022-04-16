@@ -1,13 +1,11 @@
 import { NovaClient } from '../client/NovaClient';
-import axios from 'axios';
 import { TextChannel } from 'discord.js';
 import { DateTime } from 'luxon';
 import _ from 'underscore';
-import { ServerConfig } from '../types/ServerConfig';
-import { UserProfile } from '../types/UserProfile';
 import { ConfigService } from './ConfigService';
 import { UserProfileService } from './UserProfileService';
 import { Logger } from './Logger';
+import { ServerConfig } from '../client/models/ServerConfig';
 
 export class BirthdayManager {
 	public static async populateCalendars (client: NovaClient, serverId?: string): Promise<void> {
@@ -104,20 +102,12 @@ export class BirthdayManager {
 	public static async notifyBirthdays(client: NovaClient): Promise<void> {
 		Logger.writeLog('Running birthday notifications job.');
 
-		const profileRes = await axios.get(`${process.env.API_URL}/users/birthdays`);
-		const profiles = profileRes.data as UserProfile[];
+		const profiles = await UserProfileService.getAllBirthdays();
 		const usersWithBirthdaysByServer = _.groupBy(profiles, 'serverId');
 		
 		for (const server in usersWithBirthdaysByServer) {
-			const res = await axios.get(`${process.env.API_URL}/config/${server}`)
-				.catch(err => {
-					return Logger.writeError('Error getting birthdays.', err);
-				});
 
-			if (!res)
-				return;
-
-			const config: ServerConfig = res.data;
+			const config = await ConfigService.getConfig(server);
 			if (config && config.announcementsChannelId) {
 				const srv = await client.guilds.fetch(server)
 					.catch(err => {

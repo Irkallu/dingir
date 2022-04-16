@@ -1,16 +1,14 @@
 import { Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
+import { ServerConfig } from '../../client/models/ServerConfig';
 import { BirthdayManager } from '../../utilities/BirthdayManager';
-import { ConfigService } from '../../utilities/ConfigService';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	const birthdaysCalendar = await message.channel.send('populating...');
 	config.birthdayCalendarMessagePath = `${birthdaysCalendar.channel.id}/${birthdaysCalendar.id}`;
-	const updated = await ConfigService.updateConfig(config, message);
-	if (updated)
-		await BirthdayManager.populateCalendars(client, message.guild.id);
+	await config.save();
+	await BirthdayManager.populateCalendars(client, message.guild.id);
 };
 
 const command: Command = {

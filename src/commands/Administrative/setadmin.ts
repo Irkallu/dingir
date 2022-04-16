@@ -1,8 +1,7 @@
 import { Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
-import { ConfigService } from '../../utilities/ConfigService';
+import { ServerConfig } from '../../client/models/ServerConfig';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (config.adminRoleId) {
@@ -22,10 +21,10 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		config.adminRoleId = newRole.id;
 	}
 
-	const updated: boolean = await ConfigService.updateConfig(config, message);
-	if (updated && config.adminRoleId) {
+	await config.save();
+	if (config.adminRoleId) {
 		return message.channel.send({ content: `Admin role updated to ${newRole.name} for ${message.guild.name}.` });
-	} else if (updated) {
+	} else {
 		return message.channel.send({ content: `Admin role removed for ${message.guild.name}.` });
 	}
 };

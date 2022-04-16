@@ -3,7 +3,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { CommandAccess } from '../../utilities/CommandAccess';
 import { NovaClient } from '../../client/NovaClient';
-import { ServerConfig } from '../../types/ServerConfig';
+import { ServerConfig } from '../../client/models/ServerConfig';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
 	const embed = new MessageEmbed()

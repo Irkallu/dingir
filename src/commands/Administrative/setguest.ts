@@ -2,9 +2,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
+import { ServerConfig } from '../../client/models/ServerConfig';
 import { ChannelService } from '../../utilities/ChannelService';
-import { ConfigService } from '../../utilities/ConfigService';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (args.length === 0) {
@@ -41,27 +40,25 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	}
 
 
-	const updated = ConfigService.updateConfig(config, message);
+	await config.save();
 
-	if (updated) {
-		const audit = new MessageEmbed()
-			.setColor(EmbedColours.info)
-			.setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
-			.setDescription(`Guest roles ${!config.guestRoleIds ? 'Removed' : 'Updated'}`)
-			.setTimestamp();
+	const audit = new MessageEmbed()
+		.setColor(EmbedColours.info)
+		.setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
+		.setDescription(`Guest roles ${!config.guestRoleIds ? 'Removed' : 'Updated'}`)
+		.setTimestamp();
 
-		if (!config.guestRoleIds) {
-			audit.addField('New Guest Roles', 'Not set');
-		} else {
-			audit.addField('New Guest Roles', message.mentions.roles.map(role => role.toString()).join('\n'));
-		}
-
-		await ChannelService.sendAuditMessage(client, config, audit);
+	if (!config.guestRoleIds) {
+		audit.addField('New Guest Roles', 'Not set');
+	} else {
+		audit.addField('New Guest Roles', message.mentions.roles.map(role => role.toString()).join('\n'));
 	}
 
-	if (updated && config.guestRoleIds) {
+	await ChannelService.sendAuditMessage(client, config, audit);
+
+	if (config.guestRoleIds) {
 		return message.channel.send('Guest User role(s) updated.');
-	} else if (updated) {
+	} else {
 		return message.channel.send('Guest User role removed.');
 	}
 

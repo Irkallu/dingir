@@ -2,7 +2,7 @@ import { Message } from 'discord.js';
 import { DateTime } from 'luxon';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
-import { ServerConfig } from '../../types/ServerConfig';
+import { ServerConfig } from '../../client/models/ServerConfig';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (args.length < 2) 
@@ -15,7 +15,9 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		return message.channel.send('Unable to find that role, or a role was not provided.');
 	}
 
-	const members = message.guild.members.cache.filter(member => {
+	const allMembers = await message.guild.members.fetch();
+	
+	const members = allMembers.filter(member => {
 		const joined = DateTime.fromMillis(member.joinedTimestamp).startOf('day');
 		const daysInServer = DateTime.local().startOf('day').diff(joined, 'days').toObject().days;
 		return member.roles.cache.find(r => r.id === role.id)
