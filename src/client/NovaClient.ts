@@ -4,6 +4,7 @@ import { Command } from '../types/Command';
 import { promisify } from 'util';
 import { Event } from '../types/Event';
 import { Logger } from '../utilities/Logger';
+import 'dotenv/config';
 import { sequelize } from './database/sequelize';
 
 const globPromise = promisify(glob);
@@ -24,11 +25,6 @@ class NovaClient extends Client {
 	}
 
 	public async start(): Promise<void> {
-		if (process.env.NODE_ENV !== 'production') {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			require('dotenv').config();
-		}
-
 		await sequelize.sync({
 			alter: true 
 		});
