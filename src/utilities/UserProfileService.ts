@@ -1,7 +1,21 @@
+import luxon from 'luxon';
 import { Op } from 'sequelize';
 import { UserProfile } from '../client/models/UserProfile';
 
 export class UserProfileService {
+	public static async getBirthdaysToday (): Promise<UserProfile[]> {
+		const today = luxon.DateTime.local();
+		const includeLeapDayInNoneLeapYear = (!today.isInLeapYear && today.day === 28 && today.month === 2);
+		const day = includeLeapDayInNoneLeapYear ? [28, 29] : today.day;
+		
+		return await UserProfile.findAll({
+			where: {
+				birthdayDay: day,
+				birthdayMonth: today.month
+			}
+		});
+	}
+
 	public static async getAllBirthdays (): Promise<UserProfile[]> {
 		return await UserProfile.findAll({
 			where: {
