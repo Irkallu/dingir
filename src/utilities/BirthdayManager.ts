@@ -116,7 +116,7 @@ export class BirthdayManager {
 	public static async notifyBirthdays(client: NovaClient): Promise<void> {
 		Logger.writeLog('Running birthday notifications job.');
 
-		const profiles = await UserProfileService.getAllBirthdays();
+		const profiles = await UserProfileService.getBirthdaysToday();
 		const usersWithBirthdaysByServer = _.groupBy(profiles, 'serverId');
 
 		for (const server in usersWithBirthdaysByServer) {
