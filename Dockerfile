@@ -1,6 +1,6 @@
 # Stage 1 - Build
 
-FROM node:16 AS build
+FROM node:18 AS build
 
 WORKDIR /usr/src/app
 
@@ -22,7 +22,7 @@ RUN npm run build
 
 # Stage 2 - Dist Only
 
-FROM node:16
+FROM node:18
 
 WORKDIR /usr/src/app
 
