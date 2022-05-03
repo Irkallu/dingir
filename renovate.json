@@ -1,7 +1,6 @@
 {
   "extends": [
-    "config:base",
-    "group:allNonMajor"
+    "config:base"
   ],
   "labels": ["dependencies"],
   "packageRules": [
@@ -10,12 +9,20 @@
         "enabled": false
       },
       {
-          "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+          "matchDepTypes": ["devDependencies"],
           "automerge": true
       },
       {
-          "matchDepTypes": ["devDependencies"],
-          "automerge": true
+        "matchPackagePatterns": [
+          "*"
+        ],
+        "matchUpdateTypes": [
+          "minor",
+          "patch"
+        ],
+        "groupName": "all non-major dependencies",
+        "groupSlug": "all-minor-patch",
+        "automerge": true
       }
   ],
   "platformAutomerge": true
