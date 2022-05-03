@@ -1,7 +1,9 @@
 {
   "extends": [
-    "config:base"
+    "config:base",
+    "group:allNonMajor"
   ],
+  "labels": ["dependencies"],
   "packageRules": [
       {
         "packageNames": ["node"],
