@@ -3,6 +3,7 @@
     "config:base",
     "group:allNonMajor"
   ],
+  "labels": ["dependencies"],
   "packageRules": [
       {
         "packageNames": ["node"],
