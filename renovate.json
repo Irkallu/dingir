@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "labels": ["dependencies"],
+  "packageRules": [
+      {
+        "packageNames": ["node"],
+        "enabled": false
+      },
+      {
+          "matchDepTypes": ["devDependencies"],
+          "automerge": true
+      },
+      {
+        "matchPackagePatterns": [
+          "*"
+        ],
+        "matchUpdateTypes": [
+          "minor",
+          "patch"
+        ],
+        "groupName": "all non-major dependencies",
+        "groupSlug": "all-minor-patch",
+        "automerge": true
+      }
+  ],
+  "platformAutomerge": true
+}
