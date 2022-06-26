@@ -4,9 +4,20 @@
   ],
   "labels": ["dependencies"],
   "packageRules": [
-      {
-        "packageNames": ["node"],
-        "enabled": false
-      },
+    {
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "packageNames": ["node"],
+      "enabled": false
+    }
   ]
 }
