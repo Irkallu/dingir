@@ -36,11 +36,11 @@ class NovaClient extends Client {
 			`${__dirname}/../events/**/*{.js,.ts}`
 		);
 		
-		commandFiles.map(async (cmdFile: string) => {
+		commandFiles.forEach(async (cmdFile: string) => {
 			const cmd = (await import(cmdFile)) as Command;
 			this.commands.set(cmd.name, cmd);
 		});
-		eventFiles.map(async (eventFile: string) => {
+		eventFiles.forEach(async (eventFile: string) => {
 			const event = (await import(eventFile)) as Event;
 			this.events.set(event.name, event);
 			this.on(event.name, event.run.bind(null, this));
