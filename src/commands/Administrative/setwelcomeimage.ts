@@ -38,7 +38,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	await ChannelService.sendAuditMessage(client, config, audit);
 
 	return message.channel.send({
-		content: config.welcomeMessageBackgroundUrl ? `Welcome image updated.` : 'Welcome image removed.'
+		content: config.welcomeMessageBackgroundUrl ? 'Welcome image updated.' : 'Welcome image removed.'
 	});
 };
 
