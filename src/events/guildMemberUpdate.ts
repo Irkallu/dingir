@@ -33,7 +33,7 @@ const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 	const joinedTs = DateTime.fromMillis(member.joinedTimestamp).toLocaleString((DateTime.DATE_FULL));
 
 	// Draw background
-	const background = await loadImage(config.welcomeMessageBackgroundUrl)
+	const background = await loadImage(config.welcomeMessageBackgroundUrl);
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
 	// Draw Username
@@ -89,15 +89,15 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 	
 			await ChannelService.sendAuditMessage(client, serverConfig, audit);
 		} catch (e) {
-			return Logger.writeError(`Sending audit failed in guildMemberUpdate for server: ${serverConfig.id}.`, e)
+			return Logger.writeError(`Sending audit failed in guildMemberUpdate for server: ${serverConfig.id}.`, e);
 		}
 
 		try {
 			const guestRoleIds = serverConfig.guestRoleIds.split(',');
 			const guildRoles = await newMember.guild.roles.fetch();
 		
-			await newMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)))
-			console.log(guildRoles.filter(role => guestRoleIds.includes(role.id)))
+			await newMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)));
+			console.log(guildRoles.filter(role => guestRoleIds.includes(role.id)));
 		} catch {
 			const audit = new MessageEmbed()
 				.setColor(EmbedColours.negative)
@@ -113,7 +113,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 
 		if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl) {
 			try {
-				await sendSystemMessage(serverConfig, newMember)
+				await sendSystemMessage(serverConfig, newMember);
 			} catch {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.negative)
