@@ -36,6 +36,10 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig): 
 		.setTimestamp();
 
 	await ChannelService.sendAuditMessage(client, config, audit);
+
+	return message.channel.send({
+		content: config.welcomeMessage ? `Welcome message updated.` : 'Welcome message removed.'
+	});
 };
 
 const command: Command = {

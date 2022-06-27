@@ -7,6 +7,7 @@ import { ConfigService } from '../utilities/ConfigService';
 import { Canvas, registerFont, createCanvas, loadImage } from 'canvas';
 import { DateTime } from 'luxon';
 import { ServerConfig } from '../client/models/ServerConfig';
+import { Logger } from '../utilities/Logger';
 
 const applyText = (canvas: Canvas, text: string, baseSize: number, weight: string) => {
 	const ctx = canvas.getContext('2d');
@@ -32,7 +33,7 @@ const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 	const joinedTs = DateTime.fromMillis(member.joinedTimestamp).toLocaleString((DateTime.DATE_FULL));
 
 	// Draw background
-	const background = await loadImage(config.welcomeMessageBackgroundUrl);
+	const background = await loadImage(config.welcomeMessageBackgroundUrl)
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
 	// Draw Username
@@ -76,38 +77,54 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 	const serverConfig = await ConfigService.getConfig(newMember.guild.id);
 
 	if (oldMember.pending && !newMember.pending && serverConfig.guestRoleIds) {
-		const guestRoleIds = serverConfig.guestRoleIds.split(',');
-		const guildRoles = await newMember.guild.roles.fetch();
-		const guildMember = await newMember.guild.members.fetch(newMember.user.id);
+		try {
+			const audit = new MessageEmbed()
+				.setColor(EmbedColours.neutral)
+				.setAuthor({
+					name: newMember.user.tag, iconURL: newMember.displayAvatarURL()
+				})
+				.setDescription('Rules accepted by member.')
+				.addField('ID', newMember.user.id)
+				.setTimestamp();
 	
-		await guildMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)))
-			.then(async () => {
-				const audit = new MessageEmbed()
-					.setColor(EmbedColours.neutral)
-					.setAuthor({
-						name: newMember.user.tag, iconURL: newMember.displayAvatarURL() 
-					})
-					.setDescription('Rules accepted by member.')
-					.addField('ID', newMember.user.id)
-					.setTimestamp();
-				await ChannelService.sendAuditMessage(client, serverConfig, audit);
+			await ChannelService.sendAuditMessage(client, serverConfig, audit);
+		} catch (e) {
+			return Logger.writeError(`Sending audit failed in guildMemberUpdate for server: ${serverConfig.id}.`, e)
+		}
 
-				if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl) {
-					await sendSystemMessage(serverConfig, newMember);
-				}
-			})
-			.catch(() => {
+		try {
+			const guestRoleIds = serverConfig.guestRoleIds.split(',');
+			const guildRoles = await newMember.guild.roles.fetch();
+		
+			await newMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)))
+			console.log(guildRoles.filter(role => guestRoleIds.includes(role.id)))
+		} catch {
+			const audit = new MessageEmbed()
+				.setColor(EmbedColours.negative)
+				.setAuthor({
+					name: newMember.user.tag, iconURL: newMember.displayAvatarURL() 
+				})
+				.setDescription('Unable to provide guest role(s) to user.')
+				.addField('ID', newMember.user.id)
+				.setTimestamp();
+
+			return ChannelService.sendAuditMessage(client, serverConfig, audit);
+		}
+
+		if (serverConfig.welcomeMessage && serverConfig.systemMessagesEnabled && serverConfig.welcomeMessageBackgroundUrl) {
+			try {
+				await sendSystemMessage(serverConfig, newMember)
+			} catch {
 				const audit = new MessageEmbed()
 					.setColor(EmbedColours.negative)
 					.setAuthor({
 						name: newMember.user.tag, iconURL: newMember.displayAvatarURL() 
 					})
-					.setDescription('Unable to provide guest role to user.')
+					.setDescription('Unable to send welcome message.')
 					.addField('ID', newMember.user.id)
 					.setTimestamp();
 				return ChannelService.sendAuditMessage(client, serverConfig, audit);
-			});
-
-		
+			}
+		}
 	}
 };
