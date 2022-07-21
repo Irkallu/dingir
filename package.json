@@ -14,7 +14,7 @@
 		"canvas": "2.9.3",
 		"discord.js": "13.8.1",
 		"dotenv": "16.0.1",
-		"luxon": "2.4.0",
+		"luxon": "3.0.1",
 		"node-schedule": "2.1.0",
 		"reflect-metadata": "0.1.13",
 		"sequelize": "6.21.3",
@@ -25,7 +25,7 @@
 	},
 	"devDependencies": {
 		"@types/glob": "7.2.0",
-		"@types/luxon": "2.3.2",
+		"@types/luxon": "3.0.0",
 		"@types/node": "16.11.41",
 		"@types/node-schedule": "2.1.0",
 		"@types/underscore": "1.11.4",
