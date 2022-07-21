@@ -14,7 +14,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 	}
 
 	return message.channel.send({
-		content: `Calendar successfully synchronised ${message.guild.name}.`
+		content: `Calendar successfully synchronised for ${message.guild.name}.`
 	});
 };
 
