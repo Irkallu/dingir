@@ -1,15 +1,16 @@
-import { GuildMember, MessageEmbed } from 'discord.js';
+import { GuildMember } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { RunFunction } from '../types/Event';
 import { EmbedColours } from '../resources/EmbedColours';
 import { ChannelService } from '../utilities/ChannelService';
 import { ConfigService } from '../utilities/ConfigService';
+import { EmbedCompatLayer } from '../utilities/EmbedCompatLayer';
 
 export const name = 'guildMemberAdd';
 export const run: RunFunction = async (client: NovaClient, member: GuildMember) => {
 	const serverConfig = await ConfigService.getConfig(member.guild.id);
 
-	const audit = new MessageEmbed()
+	const audit = new EmbedCompatLayer()
 		.setColor(EmbedColours.positive)
 		.setAuthor({
 			name: member.user.tag, iconURL: member.displayAvatarURL() 

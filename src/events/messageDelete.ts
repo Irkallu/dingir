@@ -1,9 +1,10 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { EmbedColours } from '../resources/EmbedColours';
 import { RunFunction } from '../types/Event';
 import { ChannelService } from '../utilities/ChannelService';
 import { ConfigService } from '../utilities/ConfigService';
+import { EmbedCompatLayer } from '../utilities/EmbedCompatLayer';
 import { UserProfileService } from '../utilities/UserProfileService';
 
 export const name = 'messageDelete';
@@ -19,7 +20,7 @@ export const run: RunFunction = async (client: NovaClient, message: Message) => 
 
 	await UserProfileService.decrementActivityScore(message.guild.id, message.author.id);
 
-	const audit = new MessageEmbed()
+	const audit = new EmbedCompatLayer()
 		.setColor(EmbedColours.neutral)
 		.setAuthor({
 			name: message.author.tag, iconURL: message.author.displayAvatarURL() 

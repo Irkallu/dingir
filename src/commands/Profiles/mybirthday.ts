@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { Command } from '../../types/Command';
 import { BirthdayManager } from '../../utilities/BirthdayManager';
 import { NovaClient } from '../../client/NovaClient';
-import { Message } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { UserProfileService } from '../../utilities/UserProfileService';
 import { ServerConfig } from '../../client/models/ServerConfig';
 
@@ -63,7 +63,7 @@ const command: Command = {
 	admin: false,
 	deleteCmd: false,
 	limited: false,
-	channels: ['GUILD_TEXT'],
+	channels: [ChannelType.GuildText],
 	run: run
 };
 

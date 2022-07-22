@@ -1,5 +1,5 @@
 import { glob } from 'glob';
-import { Client, Collection, Intents } from 'discord.js';
+import { Client, Collection, Partials, GatewayIntentBits } from 'discord.js';
 import { Command } from '../types/Command';
 import { promisify } from 'util';
 import { Event } from '../types/Event';
@@ -15,12 +15,19 @@ class NovaClient extends Client {
 
 	public constructor() {
 		super ({ 
-			partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'GUILD_MEMBER'],
-			intents: [	Intents.FLAGS.GUILDS,
-				Intents.FLAGS.GUILD_MEMBERS,
-				Intents.FLAGS.GUILD_MESSAGES,
-				Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-				Intents.FLAGS.DIRECT_MESSAGES ] 
+			partials: [
+				Partials.Message,
+				Partials.Channel, 
+				Partials.Reaction, 
+				Partials.GuildMember
+			],
+			intents: [
+				GatewayIntentBits.Guilds,
+				GatewayIntentBits.GuildMembers,
+				GatewayIntentBits.GuildMessages,
+				GatewayIntentBits.GuildMessageReactions,
+				GatewayIntentBits.DirectMessages 
+			] 
 		});
 	}
 

@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { ServerConfig } from '../client/models/ServerConfig';
 
 export class ConfigManager {
@@ -12,7 +12,7 @@ export class ConfigManager {
 			messageContent = 'Please tag the channel.';
 		} else if (!chan) {
 			messageContent = 'Channel not found, or I do not have permission to access it.';
-		} else if (!chan.isText) {
+		} else if (chan.type !== ChannelType.GuildText) {
 			messageContent = 'Channel must be a Text Channel.';
 		} 
 

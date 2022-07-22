@@ -1,9 +1,10 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
 import { ServerConfig } from '../../client/models/ServerConfig';
 import { ChannelService } from '../../utilities/ChannelService';
 import { EmbedColours } from '../../resources/EmbedColours';
+import { EmbedCompatLayer } from '../../utilities/EmbedCompatLayer';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	const oldValue = config.welcomeMessageBackgroundUrl;
@@ -25,7 +26,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 
 	await config.save();
 
-	const audit = new MessageEmbed()
+	const audit = new EmbedCompatLayer()
 		.setColor(EmbedColours.neutral)
 		.setAuthor({
 			name: message.author.tag, iconURL: message.author.displayAvatarURL() 
@@ -51,7 +52,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['GUILD_TEXT'],
+	channels: [ChannelType.GuildText],
 	run: run
 };
 

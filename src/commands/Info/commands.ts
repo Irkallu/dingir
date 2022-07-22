@@ -1,12 +1,13 @@
 import { Command } from '../../types/Command';
-import { Message, MessageEmbed } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { CommandAccess } from '../../utilities/CommandAccess';
 import { NovaClient } from '../../client/NovaClient';
 import { ServerConfig } from '../../client/models/ServerConfig';
+import { EmbedCompatLayer } from '../../utilities/EmbedCompatLayer';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
-	const embed = new MessageEmbed()
+	const embed = new EmbedCompatLayer()
 		.setThumbnail((client.user.displayAvatarURL()))
 		.setTitle('Commands List')
 		.setColor(EmbedColours.info)
@@ -34,7 +35,7 @@ const command: Command = {
 	admin: false,
 	deleteCmd: false,
 	limited: false,
-	channels: ['GUILD_TEXT', 'DM'],
+	channels: [ChannelType.GuildText, ChannelType.DM],
 	run: run
 };
 
