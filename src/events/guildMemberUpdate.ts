@@ -76,9 +76,14 @@ const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 
 export const name = 'guildMemberUpdate';
 export const run: RunFunction = async (client: NovaClient, oldMember: GuildMember, newMember: GuildMember) => {
-	const serverConfig = await ConfigService.getConfig(newMember.guild.id);
+	if (newMember.partial) {
+		await newMember.fetch();
+	}
 
-	if (newMember.roles.cache.size === 1 && !newMember.pending && serverConfig.guestRoleIds) {
+	const serverConfig = await ConfigService.getConfig(newMember.guild.id);
+	const notPassedScreen = oldMember.pending || (oldMember.pending === null && newMember.roles.cache.size === 1)
+
+	if (notPassedScreen && !newMember.pending && serverConfig.guestRoleIds) {
 		try {
 			const audit = new EmbedCompatLayer()
 				.setColor(EmbedColours.neutral)
