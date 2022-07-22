@@ -76,7 +76,7 @@ export const name = 'guildMemberUpdate';
 export const run: RunFunction = async (client: NovaClient, oldMember: GuildMember, newMember: GuildMember) => {
 	const serverConfig = await ConfigService.getConfig(newMember.guild.id);
 
-	if (oldMember.pending && !newMember.pending && serverConfig.guestRoleIds) {
+	if (newMember.roles.cache.size === 1 && !newMember.pending && serverConfig.guestRoleIds) {
 		try {
 			const audit = new MessageEmbed()
 				.setColor(EmbedColours.neutral)
