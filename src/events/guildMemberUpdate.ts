@@ -1,4 +1,4 @@
-import { GuildMember, MessageAttachment, MessageEmbed } from 'discord.js';
+import { GuildMember, AttachmentBuilder } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { RunFunction } from '../types/Event';
 import { EmbedColours } from '../resources/EmbedColours';
@@ -8,6 +8,7 @@ import { Canvas, registerFont, createCanvas, loadImage } from 'canvas';
 import { DateTime } from 'luxon';
 import { ServerConfig } from '../client/models/ServerConfig';
 import { Logger } from '../utilities/Logger';
+import { EmbedCompatLayer } from '../utilities/EmbedCompatLayer';
 
 const applyText = (canvas: Canvas, text: string, baseSize: number, weight: string) => {
 	const ctx = canvas.getContext('2d');
@@ -61,11 +62,12 @@ const sendSystemMessage = async (config: ServerConfig, member: GuildMember) => {
 	ctx.clip();
 
 	const avatar = await loadImage(member.displayAvatarURL({
-		format: 'jpg' 
+		extension: 'jpg' 
 	}));
 	ctx.drawImage(avatar, 50, 50, 150, 150);
 
-	const attachment = new MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+	const attachment = new AttachmentBuilder(canvas.toBuffer())
+		.setName('welcome-image.png');
 
 	await member.guild.systemChannel.send({
 		content: welcomeMessage, files: [attachment]
@@ -78,7 +80,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 
 	if (newMember.roles.cache.size === 1 && !newMember.pending && serverConfig.guestRoleIds) {
 		try {
-			const audit = new MessageEmbed()
+			const audit = new EmbedCompatLayer()
 				.setColor(EmbedColours.neutral)
 				.setAuthor({
 					name: newMember.user.tag, iconURL: newMember.displayAvatarURL()
@@ -99,7 +101,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			await newMember.roles.add(guildRoles.filter(role => guestRoleIds.includes(role.id)));
 			console.log(guildRoles.filter(role => guestRoleIds.includes(role.id)));
 		} catch {
-			const audit = new MessageEmbed()
+			const audit = new EmbedCompatLayer()
 				.setColor(EmbedColours.negative)
 				.setAuthor({
 					name: newMember.user.tag, iconURL: newMember.displayAvatarURL() 
@@ -115,7 +117,7 @@ export const run: RunFunction = async (client: NovaClient, oldMember: GuildMembe
 			try {
 				await sendSystemMessage(serverConfig, newMember);
 			} catch {
-				const audit = new MessageEmbed()
+				const audit = new EmbedCompatLayer()
 					.setColor(EmbedColours.negative)
 					.setAuthor({
 						name: newMember.user.tag, iconURL: newMember.displayAvatarURL() 

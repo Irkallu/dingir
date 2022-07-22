@@ -1,4 +1,4 @@
-import { Message, TextChannel } from 'discord.js';
+import { ChannelType, Message, TextChannel } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
 import { ServerConfig } from '../../client/models/ServerConfig';
@@ -10,7 +10,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 		return message.channel.send('Channel not found, or I do not have permission to access it.');
 	}
 
-	if (!channel.isText) {
+	if (channel.type !== ChannelType.GuildText) {
 		return message.channel.send('Channel must be a text channel.');
 	}
 
@@ -43,7 +43,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['GUILD_TEXT'],
+	channels: [ChannelType.GuildText],
 	run: run
 };
 

@@ -1,7 +1,8 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
+import { EmbedCompatLayer } from '../../utilities/EmbedCompatLayer';
 import { UserProfileService } from '../../utilities/UserProfileService';
 
 const run = async (client: NovaClient, message: Message): Promise<any> => {
@@ -13,7 +14,7 @@ const run = async (client: NovaClient, message: Message): Promise<any> => {
 
 	const userProfile = await UserProfileService.getUserProfile(message.guild.id, mem.user.id);
 
-	const embed = new MessageEmbed()
+	const embed = new EmbedCompatLayer()
 		.setThumbnail((mem.displayAvatarURL()))
 		.setColor(EmbedColours.info)
 		.setTitle('User Profile')
@@ -40,7 +41,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['GUILD_TEXT'],
+	channels: [ChannelType.GuildText],
 	run: run
 };
 

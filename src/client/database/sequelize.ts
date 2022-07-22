@@ -1,4 +1,4 @@
-import {Sequelize} from 'sequelize-typescript';
+import { Sequelize } from 'sequelize-typescript';
 import { Logger } from '../../utilities/Logger';
 
 import { ServerConfig } from '../models/ServerConfig';

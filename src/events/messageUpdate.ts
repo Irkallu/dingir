@@ -1,9 +1,10 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { EmbedColours } from '../resources/EmbedColours';
 import { RunFunction } from '../types/Event';
 import { ChannelService } from '../utilities/ChannelService';
 import { ConfigService } from '../utilities/ConfigService';
+import { EmbedCompatLayer } from '../utilities/EmbedCompatLayer';
 
 export const name = 'messageUpdate';
 export const run: RunFunction = async (client: NovaClient, oldMessage: Message, newMessage: Message) => {
@@ -23,7 +24,7 @@ export const run: RunFunction = async (client: NovaClient, oldMessage: Message, 
 		return;
 	}
 
-	const audit = new MessageEmbed()
+	const audit = new EmbedCompatLayer()
 		.setColor(EmbedColours.neutral)
 		.setAuthor({
 			name: newMessage.author.tag, iconURL: newMessage.author.displayAvatarURL() 

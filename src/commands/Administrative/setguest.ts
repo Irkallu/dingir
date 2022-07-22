@@ -1,9 +1,10 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { EmbedColours } from '../../resources/EmbedColours';
 import { Command } from '../../types/Command';
 import { ServerConfig } from '../../client/models/ServerConfig';
 import { ChannelService } from '../../utilities/ChannelService';
+import { EmbedCompatLayer } from '../../utilities/EmbedCompatLayer';
 
 const run = async (client: NovaClient, message: Message, config: ServerConfig, args: any[]): Promise<any> => {
 	if (args.length === 0) {
@@ -20,7 +21,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 			currentGuestRoles.push(guestRole ? guestRole.toString() : 'Unknown');
 		});
 
-		const embed = new MessageEmbed()
+		const embed = new EmbedCompatLayer()
 			.setColor(EmbedColours.info)
 			.setTitle('Current Guest Roles')
 			.setDescription(currentGuestRoles.join('\n'))
@@ -44,7 +45,7 @@ const run = async (client: NovaClient, message: Message, config: ServerConfig, a
 
 	await config.save();
 
-	const audit = new MessageEmbed()
+	const audit = new EmbedCompatLayer()
 		.setColor(EmbedColours.info)
 		.setAuthor({
 			name: message.author.tag, iconURL: message.author.displayAvatarURL() 
@@ -77,7 +78,7 @@ const command: Command = {
 	admin: true,
 	deleteCmd: false,
 	limited: false,
-	channels: ['GUILD_TEXT'],
+	channels: [ChannelType.GuildText],
 	run: run
 };
 

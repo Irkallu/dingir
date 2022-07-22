@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { NovaClient } from '../../client/NovaClient';
 import { Command } from '../../types/Command';
 import { ServerConfig } from '../../client/models/ServerConfig';
@@ -49,7 +49,7 @@ const command: Command = {
 	deleteCmd: false,
 	limited: true,
 	limitation: 'Can be used by anyone when there is no admin role set for setup purposes.',
-	channels: ['GUILD_TEXT'],
+	channels: [ChannelType.GuildText],
 	run: run
 };
 

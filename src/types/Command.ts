@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { ServerConfig } from '../client/models/ServerConfig';
 import { NovaClient } from '../client/NovaClient';
 
@@ -13,5 +13,5 @@ export interface Command {
 	deleteCmd: boolean,
 	limited: boolean,
 	limitation?: string,
-	channels: string[]
+	channels: ChannelType[]
 }

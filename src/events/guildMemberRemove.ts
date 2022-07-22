@@ -1,9 +1,10 @@
-import { GuildMember, MessageEmbed } from 'discord.js';
+import { GuildMember } from 'discord.js';
 import { NovaClient } from '../client/NovaClient';
 import { EmbedColours } from '../resources/EmbedColours';
 import { RunFunction } from '../types/Event';
 import { ChannelService } from '../utilities/ChannelService';
 import { ConfigService } from '../utilities/ConfigService';
+import { EmbedCompatLayer } from '../utilities/EmbedCompatLayer';
 import { UserProfileService } from '../utilities/UserProfileService';
 
 export const name = 'guildMemberRemove';
@@ -14,7 +15,7 @@ export const run: RunFunction = async (client: NovaClient, member: GuildMember) 
 
 	const dataDeleted = await UserProfileService.deleteUser(member.guild.id, member.user.id);
 
-	const audit = new MessageEmbed()
+	const audit = new EmbedCompatLayer()
 		.setColor(EmbedColours.negative)
 		.setAuthor({
 			name: member.user.tag, iconURL: member.displayAvatarURL() 
