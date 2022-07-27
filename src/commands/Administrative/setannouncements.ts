@@ -1,24 +1,17 @@
-import { ChannelType, Message } from 'discord.js';
-import { NovaClient } from '../../client/NovaClient';
-import { Command } from '../../types/Command';
+import { ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { ServerConfig } from '../../client/models/ServerConfig';
 import { ConfigManager } from '../../utilities/ConfigManager';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
-	await ConfigManager.updateChannel(config, message, 'announcementsChannelId');
+export const execute = async (interaction: ChatInputCommandInteraction, config: ServerConfig): Promise<any> => {
+	await ConfigManager.updateChannel(config, interaction, 'announcementsChannelId');
 };
 
-const command: Command = {
-	name: 'setannouncements',
-	title: 'Set the announcements channel',
-	description: 'Sets the channel where the bot posts announcements.',
-	usage: 'setannouncements <channel mention>',
-	example: 'setannouncements #general',
-	admin: true,
-	deleteCmd: false,
-	limited: false,
-	channels: [ChannelType.GuildText],
-	run: run
-};
-
-export = command;
+export const data = new SlashCommandBuilder()
+	.setName('announcements')
+	.setDescription('Sets the channel which announcements are posted in.')
+	.addChannelOption(option => 
+		option.setName('channel')
+			.setDescription('Channel to post announcements in')
+			.setRequired(true))
+	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+	.setDMPermission(false);

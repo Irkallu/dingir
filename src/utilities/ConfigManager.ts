@@ -1,9 +1,9 @@
-import { ChannelType, Message } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, InteractionResponse } from 'discord.js';
 import { ServerConfig } from '../client/models/ServerConfig';
 
 export class ConfigManager {
-	public static async updateChannel (serverConfig: ServerConfig, message: Message, field: string): Promise<Message> {
-		const chan = message.mentions.channels.first();
+	public static async updateChannel (serverConfig: ServerConfig, interaction: ChatInputCommandInteraction, field: string): Promise<InteractionResponse> {
+		const chan = interaction.options.getChannel('channel');
 
 		let messageContent: string;
 		if(!chan && serverConfig[field]) {
@@ -17,8 +17,9 @@ export class ConfigManager {
 		} 
 
 		if (messageContent) {
-			return message.channel.send({
-				content: messageContent 
+			return interaction.reply ({
+				content: messageContent,
+				ephemeral: true
 			});
 		}
     
@@ -29,12 +30,14 @@ export class ConfigManager {
 		await serverConfig.save();
     
 		if (serverConfig[field]) {
-			return message.channel.send({
-				content: `Channel updated to ${chan.toString()}.` 
+			return interaction.reply ({
+				content: `Channel updated to ${chan.toString()}.`,
+				ephemeral: true
 			});
 		} else {
-			return message.channel.send({
-				content: 'Channel disabled.' 
+			return interaction.reply ({
+				content: 'Channel disabled.',
+				ephemeral: true
 			});
 		}
 	}

@@ -1,24 +1,17 @@
-import { ChannelType, Message } from 'discord.js';
-import { NovaClient } from '../../client/NovaClient';
-import { Command } from '../../types/Command';
+import { ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { ServerConfig } from '../../client/models/ServerConfig';
 import { ConfigManager } from '../../utilities/ConfigManager';
 
-const run = async (client: NovaClient, message: Message, config: ServerConfig): Promise<any> => {
-	await ConfigManager.updateChannel(config, message, 'auditChannelId');
+export const execute = async (interaction: ChatInputCommandInteraction, config: ServerConfig): Promise<any> => {
+	await ConfigManager.updateChannel(config, interaction, 'auditChannelId');
 };
 
-const command: Command = {
-	name: 'setaudit',
-	title: 'Set the audit channel',
-	description: 'Sets the channel where the bot posts audit logs.',
-	usage: 'setaudit <channel mention>',
-	example: 'setaudit #general',
-	admin: true,
-	deleteCmd: false,
-	limited: false,
-	channels: [ChannelType.GuildText],
-	run: run
-};
-
-export = command;
+export const data = new SlashCommandBuilder()
+	.setName('audit')
+	.setDescription('Sets the channel which audits are posted in.')
+	.addChannelOption(option =>
+		option.setName('channel')
+			.setDescription('Channel to post audits in')
+			.setRequired(true))
+	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+	.setDMPermission(false);
